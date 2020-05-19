@@ -1,1 +1,2 @@
-# tizaara-api
+# Tizaara API
+
