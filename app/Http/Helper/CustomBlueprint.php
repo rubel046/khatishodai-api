@@ -18,6 +18,11 @@ class CustomBlueprint extends Blueprint
        // $this->boolean('isActive')->default(0);
     }
 
+    public function productId($column = 'product_id')
+    {
+        return $this->integer($column);
+    }
+
 }
 
 ?>

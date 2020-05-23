@@ -23,7 +23,7 @@ $router->group(['prefix' => 'account','middleware'=>'InputTrim'], function () us
     $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
     $router->post('forget-password', 'PasswordController@forgetPassword');
-    $router->get('password-reset/{id}/{token}', 'PasswordController@resetPassword');
+    $router->get('password-reset/{id}/{verify_token}', 'PasswordController@resetPassword');
     $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
     $router->post('logout', 'AuthController@logout');
     $router->get('profile', 'UserController@profile');
@@ -73,11 +73,12 @@ $router->group(['prefix' => 'product/attribute/group','middleware'=>'InputTrim']
 
 // API route group product/attribute
 $router->group(['prefix' => 'product/attribute','middleware'=>'InputTrim'], function () use ($router) {
-    $router->get('/', 'AttributeController@index');//$router->get('list', 'AttributeController@index');
-    $router->post('/', 'AttributeController@store');// $router->post('create', 'AttributeController@store');
-    $router->get('{id}', 'AttributeController@show');//$router->get('{id}/show', 'AttributeController@show');
+    $router->get('list', 'AttributeController@index'); //$router->get('/', 'AttributeController@index');
+    $router->post('create', 'AttributeController@store'); // $router->post('/', 'AttributeController@store');
+    $router->get('{id}/show', 'AttributeController@show'); //$router->get('{id}', 'AttributeController@show');
+    $router->get('{id}/edit', 'AttributeController@edit'); //$router->get('{id}', 'AttributeController@show');
     $router->post('{id}/update','AttributeController@update');//$router->post('{id}/update','AttributeController@update');
-    $router->delete('{id}','AttributeController@destroy'); //$router->delete('{id}/delete','AttributeController@destroy');
+    $router->delete('{id}/delete','AttributeController@destroy');// $router->delete('{id}','AttributeController@destroy');
     $router->post('search','AttributeController@search');
 
 });
@@ -110,7 +111,7 @@ $router->group(['prefix' => 'category','middleware'=>'InputTrim'], function () u
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {
-    $router->get('sendMeTest', 'EmailController@sendTestEmail');
+    $router->get('send-test-email', 'EmailController@sendTestEmail');
     $router->get('user-email', 'UserController@sendEmail');
     $router->post('forget-password', 'PasswordController@forgetPassword');
 

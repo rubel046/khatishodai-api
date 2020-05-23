@@ -22,7 +22,9 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:categories'
+            'name' => 'required|string|unique:categories',
+            'parent_id' => 'required|numeric',
+            'rank' => 'required|string'
         ]);
 
         try {
@@ -98,7 +100,7 @@ class CategoryController extends Controller
 
         try {
             $data = $request->all();
-            $data['updated_by'] = 1;
+            //$data['updated_by'] = 1;
             $data['updated_at'] = Carbon::now();
             $data['ip_address'] = $request->ip();
             Category::where('id', $id)->update($request->all());

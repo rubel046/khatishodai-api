@@ -98,7 +98,7 @@ class CompanyController extends Controller
         $this->validate($request, [
             'name' => 'required|string|unique:companies',
             'web_url' => 'required|string|unique:companies',
-            'status' => 'required|boolean'
+            'status' => 'required|numeric'
         ]);
 
         try {
