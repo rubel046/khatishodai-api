@@ -92,7 +92,7 @@ class CountryController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'code' => 'required|string|unique:countries',
+            'code' => 'required|string|unique:countries'.$id,
             'status' => 'required|numeric'
         ]);
 
