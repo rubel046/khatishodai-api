@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
 
-class CreateBrandsTable extends Migration
+class CreatePageInfosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -20,13 +20,10 @@ class CreateBrandsTable extends Migration
             return new CustomBlueprint($table, $callback);
         });
 
-        $schema->create('brands', function (CustomBlueprint $table) {
+        $schema->create('page_infos', function (CustomBlueprint $table) {
             $table->id();
             $table->string('name',100);
-            $table->string('code',100)->nullable();
-            $table->string('image',100)->nullable();
-            $table->integer('rank')->nullable();
-            $table->integer('sort_order')->nullable();
+            $table->integer('menu_id');
             $table->commonFields();
         });
     }
@@ -38,6 +35,6 @@ class CreateBrandsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('brands');
+        Schema::dropIfExists('page_infos');
     }
 }

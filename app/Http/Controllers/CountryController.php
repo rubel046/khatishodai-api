@@ -15,7 +15,15 @@ class CountryController extends Controller
 
     public function index()
     {
-        return response()->json(['countries' => Country::all()], 200);
+        $resutls= Country::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+            'per_page'=> $resutls->perPage(),
+            'total_page'=> $resutls->lastPage(),
+            'total_item'=> $resutls->total(),
+            'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
     public function store(Request $request)
@@ -50,19 +58,6 @@ class CountryController extends Controller
         }
     }
 
-
-    public function edit($id)
-    {
-        try {
-            $data = Country::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => 'Data not found!'], 404);
-        }
-    }
 
     public function search(Request $request)
     {

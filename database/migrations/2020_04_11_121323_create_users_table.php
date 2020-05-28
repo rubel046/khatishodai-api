@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
         $schema->create('users', function (CustomBlueprint $table) {
             $table->id();
             $table->tinyInteger('userType')->nullable()->unsigned();
+            $table->tinyInteger('userType')->nullable()->unsigned();
             $table->string('userName',100)->unique()->nullable();
             $table->string('password');
             $table->string('email',100)->unique()->nullable();

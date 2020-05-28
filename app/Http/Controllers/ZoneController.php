@@ -15,7 +15,15 @@ class ZoneController extends Controller
 
     public function index()
     {
-        return response()->json(['zones' => Zone::all()], 200);
+        $resutls= Zone::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+            'per_page'=> $resutls->perPage(),
+            'total_page'=> $resutls->lastPage(),
+            'total_item'=> $resutls->total(),
+            'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
 
@@ -46,22 +54,10 @@ class ZoneController extends Controller
 
         } catch (\Exception $e) {
 
-            return response()->json(['message' => 'Data not found!'], 404);
+            return response()->json(['message' => NO_DATA], 404);
         }
     }
 
-
-    public function edit($id)
-    {
-        try {
-            $data = Zone::findOrFail($id);
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => 'Data not found!'], 404);
-        }
-    }
 
     public function search(Request $request)
     {

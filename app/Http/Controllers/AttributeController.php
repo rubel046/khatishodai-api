@@ -15,7 +15,15 @@ class AttributeController extends Controller
 
     public function index()
     {
-        return response()->json(['data' => Attribute::all()], 200);
+        $resutls= Attribute::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+            'per_page'=> $resutls->perPage(),
+            'total_page'=> $resutls->lastPage(),
+            'total_item'=> $resutls->total(),
+            'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
 
@@ -61,20 +69,6 @@ class AttributeController extends Controller
         }
     }
 
-
-    public function edit($id)
-    {
-        try {
-            $attributes = Attribute::findOrFail($id);
-
-            return response()->json(['data' => $attributes], 200);
-
-        } catch (\Exception $e) {
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
-        }
-    }
 
     public function search(Request $request)
     {

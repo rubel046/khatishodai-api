@@ -15,7 +15,15 @@ class BusinessTypeController extends Controller
 
     public function index()
     {
-        return response()->json(['btypes' => BusinessType::all()], 200);
+        $resutls= BusinessType::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+            'per_page'=> $resutls->perPage(),
+            'total_page'=> $resutls->lastPage(),
+            'total_item'=> $resutls->total(),
+            'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
 
@@ -55,20 +63,6 @@ class BusinessTypeController extends Controller
         }
     }
 
-
-    public function edit($id)
-    {
-        try {
-            $bTypes = BusinessType::findOrFail($id);
-
-            return response()->json(['btypes' => $bTypes], 200);
-
-        } catch (\Exception $e) {
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
-        }
-    }
 
     public function search(Request $request)
     {
