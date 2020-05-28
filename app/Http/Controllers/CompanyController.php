@@ -22,23 +22,24 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:companies',
-            'web_url' => 'required|string|unique:companies',
-            'status' => 'required|boolean'
+            'name' => 'required|string|unique:companies,name',
+            'web_url' => 'required|string|unique:companies,web_url',
+            'business_type_id' => 'required|numeric',
+            'address' => 'required|string',
+            'status' => 'required|numeric'
         ]);
 
         try {
-            $data = new Company;
-            $data->name = $request->name;
-            $data->web_url = $request->web_url;
-            $data->status = $request->status;
+
+            $postData=$request->all();
+            $postData['ip_address']=$request->ip();
+            $data= Company::create($postData);
             $data->ip_address = $request->ip();
             $data->save();
-            return response()->json(['data' => $data, 'message' => 'Created successfully!'], 201);
+            return response()->json(['data' => $data, 'message' => SAVE_SUCCESS], 201);
 
         } catch (\Exception $e) {
-            dd($e);
-            return response()->json(['message' => 'Error found',], 409);
+            return response()->json(['message' => ERROR_MSG,], 409);
         }
     }
 
@@ -52,7 +53,7 @@ class CompanyController extends Controller
 
         } catch (\Exception $e) {
 
-            return response()->json(['message' => 'Data not found!'], 404);
+            return response()->json(['message' => ERROR_MSG], 404);
         }
     }
 
@@ -66,7 +67,7 @@ class CompanyController extends Controller
 
         } catch (\Exception $e) {
 
-            return response()->json(['message' => 'Data not found!'], 404);
+            return response()->json(['message' => ERROR_MSG], 404);
         }
     }
 
@@ -80,15 +81,15 @@ class CompanyController extends Controller
                 ->orWhere('web_url', 'LIKE', "%{$searchItem}%")
                 ->get();
             if(!$data->isEmpty()){
-                return response()->json(['data' => $data,'message' => 'Result  with this query'], 200);
+                return response()->json(['data' => $data,'message' => DATA_FOUND], 200);
             }else{
-                return response()->json(['data' => $data,'message' => 'No data found!'], 404);
+                return response()->json(['data' => $data,'message' => NO_DATA], 404);
             }
 
 
         } catch (\Exception $e) {
             //dd($e);
-            return response()->json(['message' => 'Error found!'], 500);
+            return response()->json(['message' => ERROR_MSG], 500);
         }
 
     }
@@ -96,8 +97,8 @@ class CompanyController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:companies',
-            'web_url' => 'required|string|unique:companies',
+            'name' => 'required|string|unique:companies,name,'.$id,
+            'web_url' => 'required|string|unique:companies,web_url,'.$id,
             'status' => 'required|numeric'
         ]);
 
@@ -107,7 +108,7 @@ class CompanyController extends Controller
             $data['updated_at'] = Carbon::now();
             $data['ip_address'] = $request->ip();
             Company::where('id', $id)->update($request->all());
-            return response()->json(['message' => 'Data updated successfully'], 200);
+            return response()->json(['message' => UPDATE_SUCCESS], 200);
         } catch (\Exception $e) {
             $errCode=$e->getCode();
             $errMgs=$e->getMessage();
@@ -120,7 +121,7 @@ class CompanyController extends Controller
     {
         try {
             Company::findOrFail($id)->delete();
-            return response()->json(['message' => 'Data deleted successfully'], 200);
+            return response()->json(['message' => DELETE_SUCCESS], 200);
         } catch (\Exception $e) {
 
             $errCode=$e->getCode();

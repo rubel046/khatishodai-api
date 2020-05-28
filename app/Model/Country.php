@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Country extends Model
 {
-    //
     use SoftDeletes;
-    protected $fillable = ['name','code'];
+    protected $guarded = [];
+    //protected $fillable = ['name','code'];
     public function zone()
     {
         return $this->hasMany('App\Model\Zone');
