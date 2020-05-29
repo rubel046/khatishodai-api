@@ -35,7 +35,15 @@ class UserController extends Controller
      */
     public function allUsers()
     {
-        return response()->json(['users' =>  User::all()], 200);
+        $resutls= User::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+            'per_page'=> $resutls->perPage(),
+            'total_page'=> $resutls->lastPage(),
+            'total_item'=> $resutls->total(),
+            'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
     /**

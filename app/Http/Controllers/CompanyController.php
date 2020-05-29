@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Model\Company;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use DB;
 
 class CompanyController extends Controller
 {
@@ -15,7 +16,15 @@ class CompanyController extends Controller
 
     public function index()
     {
-        return response()->json(['companies' => Company::all()], 200);
+        $resutls= Company::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+           'per_page'=> $resutls->perPage(),
+           'total_page'=> $resutls->lastPage(),
+           'total_item'=> $resutls->total(),
+           'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
 
@@ -57,19 +66,6 @@ class CompanyController extends Controller
         }
     }
 
-
-    public function edit($id)
-    {
-        try {
-            $data = Company::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => ERROR_MSG], 404);
-        }
-    }
 
     public function search(Request $request)
     {

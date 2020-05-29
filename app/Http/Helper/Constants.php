@@ -6,6 +6,7 @@
     define('NO_DATA','No data found!');
     define('DATA_FOUND','Result with this query!');
     define('ERROR_MSG','Error  occurred!');
+    define('PER_PAGE',5);
 
 
 ?>

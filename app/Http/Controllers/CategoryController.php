@@ -15,7 +15,15 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return response()->json(['data' => Category::all()], 200);
+        $resutls= Category::paginate(PER_PAGE);
+        $items=$resutls->items();
+        $meta=[
+            'per_page'=> $resutls->perPage(),
+            'total_page'=> $resutls->lastPage(),
+            'total_item'=> $resutls->total(),
+            'current_page'=> $resutls->currentPage()
+        ];
+        return response()->json(['results' => $items,'meta'=>$meta], 200);
     }
 
 
@@ -42,19 +50,6 @@ class CategoryController extends Controller
         }
     }
 
-
-    public function show($id)
-    {
-        try {
-            $data = Category::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => 'Data not found!'], 404);
-        }
-    }
 
 
     public function edit($id)

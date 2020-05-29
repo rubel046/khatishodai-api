@@ -40,7 +40,6 @@ $router->group(['prefix' => 'btype','middleware'=>'InputTrim'], function () use 
     $router->get('list', 'BusinessTypeController@index');
     $router->post('create', 'BusinessTypeController@store');
     $router->get('{id}/show', 'BusinessTypeController@show');
-    $router->get('{id}/edit', 'BusinessTypeController@edit');
     $router->post('{id}/update','BusinessTypeController@update');
     $router->post('search','BusinessTypeController@search');
     $router->delete('{id}/delete','BusinessTypeController@destroy');
@@ -52,7 +51,6 @@ $router->group(['prefix' => 'brand','middleware'=>'InputTrim'], function () use 
     $router->get('list', 'BrandController@index');
     $router->post('create', 'BrandController@store');
     $router->get('{id}/show', 'BrandController@show');
-    $router->get('{id}/edit', 'BrandController@edit');
     $router->post('{id}/update','BrandController@update');
     $router->post('search','BrandController@search');
     $router->delete('{id}/delete','BrandController@destroy');
@@ -64,7 +62,6 @@ $router->group(['prefix' => 'product/attribute/group','middleware'=>'InputTrim']
     $router->get('list', 'AttributeGroupController@index');
     $router->post('create', 'AttributeGroupController@store');
     $router->get('{id}/show', 'AttributeGroupController@show');
-    $router->get('{id}/edit', 'AttributeGroupController@edit');
     $router->post('{id}/update','AttributeGroupController@update');
     $router->post('search','AttributeGroupController@search');
     $router->delete('{id}/delete','AttributeGroupController@destroy');
@@ -76,7 +73,6 @@ $router->group(['prefix' => 'product/attribute','middleware'=>'InputTrim'], func
     $router->get('list', 'AttributeController@index'); //$router->get('/', 'AttributeController@index');
     $router->post('create', 'AttributeController@store'); // $router->post('/', 'AttributeController@store');
     $router->get('{id}/show', 'AttributeController@show'); //$router->get('{id}', 'AttributeController@show');
-    $router->get('{id}/edit', 'AttributeController@edit'); //$router->get('{id}', 'AttributeController@show');
     $router->post('{id}/update','AttributeController@update');//$router->post('{id}/update','AttributeController@update');
     $router->delete('{id}/delete','AttributeController@destroy');// $router->delete('{id}','AttributeController@destroy');
     $router->post('search','AttributeController@search');
@@ -88,7 +84,6 @@ $router->group(['prefix' => 'company','middleware'=>'InputTrim'], function () us
     $router->get('list', 'CompanyController@index');
     $router->post('create', 'CompanyController@store');
     $router->get('{id}/show', 'CompanyController@show');
-    $router->get('{id}/edit', 'CompanyController@edit');
     $router->post('{id}/update','CompanyController@update');
     $router->post('search','CompanyController@search');
     $router->delete('{id}/delete','CompanyController@destroy');
@@ -100,7 +95,6 @@ $router->group(['prefix' => 'category','middleware'=>'InputTrim'], function () u
     $router->get('list', 'CategoryController@index');
     $router->post('create', 'CategoryController@store');
     $router->get('{id}/show', 'CategoryController@show');
-    $router->get('{id}/edit', 'CategoryController@edit');
     $router->post('{id}/update','CategoryController@update');
     $router->post('search','CategoryController@search');
     $router->delete('{id}/delete','CategoryController@destroy');
@@ -122,7 +116,6 @@ $router->group(['prefix' => 'country','middleware'=>'InputTrim'], function () us
     $router->get('list', 'CountryController@index');
     $router->post('create', 'CountryController@store');
     $router->get('{id}/show', 'CountryController@show');
-    $router->get('{id}/edit', 'CountryController@edit');
     $router->post('{id}/update','CountryController@update');
     $router->post('search','CountryController@search');
     $router->delete('{id}/delete','CountryController@destroy');
@@ -134,7 +127,6 @@ $router->group(['prefix' => 'zone','middleware'=>'InputTrim'], function () use (
     $router->get('list', 'ZoneController@index');
     $router->post('create', 'ZoneController@store');
     $router->get('{id}/show', 'ZoneController@show');
-    $router->get('{id}/edit', 'ZoneController@edit');
     $router->post('{id}/update','ZoneController@update');
     $router->post('search','ZoneController@search');
     $router->delete('{id}/delete','ZoneController@destroy');
@@ -146,7 +138,6 @@ $router->group(['prefix' => 'menu_operations','middleware'=>'InputTrim'], functi
     $router->get('list', 'MenuOperationController@index');
     $router->post('create', 'MenuOperationController@store');
     $router->get('{id}/show', 'MenuOperationController@show');
-    $router->get('{id}/edit', 'MenuOperationController@edit');
     $router->post('{id}/update','MenuOperationController@update');
     $router->post('search','MenuOperationController@search');
     $router->delete('{id}/delete','MenuOperationController@destroy');
