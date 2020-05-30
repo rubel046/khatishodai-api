@@ -46,7 +46,7 @@ class PasswordController extends Controller
                 $user->save();
 
                 $toEmail=$user->email;
-                $toName=$user->firstName.' '.$user->lastName;
+                $toName=$user->first_name.' '.$user->last_name;
                 $data=[
                     'id'=>$user->id,
                     'email'=>$toEmail,
@@ -107,7 +107,7 @@ class PasswordController extends Controller
                 $user->save();
 
                 $toEmail=$user->email;
-                $toName=$user->firstName.' '.$user->userName;
+                $toName=$user->first_name.' '.$user->userName;
                 $data=[
                     'id'=>$user->id,
                     'email'=>$toEmail,
@@ -180,7 +180,7 @@ class PasswordController extends Controller
         if (empty($user)) {
             return response()->json(['message' => 'Invalid Request'], 401);
         } else {
-            $toName=$user->firstName." ".$user->lastName;
+            $toName=$user->first_name." ".$user->last_name;
             $toEmail=$user->email;
             $data=[
                 'id'=>$user->id,
@@ -236,7 +236,7 @@ class PasswordController extends Controller
             $authController= new AuthController();
             $userName= $authController->findLoginWith($request->emailOrPhone);
             if($userName=='email'){
-                $toName=$user->firstName." ".$user->lastName;
+                $toName=$user->first_name." ".$user->last_name;
                 $toEmail=$user->email;
                 $data=[
                     'id'=>$user->id,

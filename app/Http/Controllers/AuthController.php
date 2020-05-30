@@ -66,18 +66,18 @@ class AuthController extends Controller
 
         try {
             $user = new User;
-            $user->firstName = $request->input('firstName');
-            $user->lastName = $request->input('lastName');
+            $user->first_name = $request->input('firstName');
+            $user->last_name = $request->input('lastName');
             $user->userName = $request->input('emailOrPhone');
             $user->email = $email;
-            $user->userType = $request->input('userType');
+            $user->account_type = $request->input('userType');
             $user->phone = $phone;
             $plainPassword = $request->input('password');
             $user->password = app('hash')->make($plainPassword);
-            $user->isVerified = 0;
+            $user->is_verified = 0;
             $user->save();
 
-            $toName = $user->firstName . ' ' . $user->lastName;
+            $toName = $user->first_name . ' ' . $user->last_name;
 
             if ($email) {
                 $user->verificationToken =  CommonHelper::strRandom(40);
@@ -236,11 +236,11 @@ class AuthController extends Controller
         if (empty($user)) {
             return 'Invalid request!!';
         } else {
-            $user->isVerified = 1;
+            $user->is_verified = 1;
             $user->status = 1;
             $user->verificationToken = null;
             $user->save();
-            $toName = $user->firstName . " " . $user->lastName;
+            $toName = $user->first_name . " " . $user->last_name;
             $toEmail = $user->email;
             $data = [
                 'email' => $toEmail,
@@ -394,7 +394,7 @@ class AuthController extends Controller
         $nowDate = date('Y-m-d');
         $data = User::whereDate('created_at','=',$nowDate)
             ->where('phone', 'LIKE', "%$phone%")
-            ->where('isVerified', '=', "0")
+            ->where('is_verified', '=', "0")
             ->first();
         if( !empty($data)){
             // $nowDate = date('Y-m-d H:i:s');
@@ -425,7 +425,7 @@ class AuthController extends Controller
         if( !empty($user)){
             $res='success';
             $mgs='OTP Verification Success';
-            $user->isVerified=1;
+            $user->is_verified=1;
             $user->status=1;
             $user->save();
 
