@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
-class CreateUserPrivilegesTable extends Migration
+class CreateMenuItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,12 +18,11 @@ class CreateUserPrivilegesTable extends Migration
         $schema->blueprintResolver(function ($table, $callback) {
             return new CustomBlueprint($table, $callback);
         });
-
-        $schema->create('user__privileges', function (CustomBlueprint $table) {
+        $schema->create('menu_items', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable()->unsigned();
-            $table->integer('menu_id')->nullable()->unsigned();
-            $table->integer('operation_ids')->nullable()->unsigned();
+            $table->integer('parent_id')->nullable()->unsigned();
+            $table->string('name', 150)->nullable();
+            $table->string('description', 255)->nullable();
             $table->commonFields();
         });
     }
@@ -35,6 +34,6 @@ class CreateUserPrivilegesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user__privileges');
+        Schema::dropIfExists('menu_items');
     }
 }
