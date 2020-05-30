@@ -118,12 +118,13 @@ class BrandController extends Controller
         ]);
 
         try {
-            $brands = Brand::findOrFail($id);
             $data = $request->except('image');
-            $brands-> updated_by = 1;
-            $brands-> updated_at = Carbon::now();
-            $brands-> ip_address = $request->ip();
+            $data['updated_by'] = 1;
+            $data['updated_at'] = Carbon::now();
+            $data['ip_address'] = $request->ip();
+            Brand::where('id', $id)->update($data);
 
+            $brands = Brand::findOrFail($id);
             if ($request->hasFile('image')) {
                 $original_filename = $request->file('image')->getClientOriginalName();
                 $original_filename_arr = explode('.', $original_filename);
@@ -132,7 +133,8 @@ class BrandController extends Controller
                 $image = $id.'-' . time() . '.' . $file_ext;
 
                 if ($request->file('image')->move($destination_path, $image)) {
-                    $filename = base_path().'/public'.$brands->image;
+                    $filename = base_path().'/public/'.$brands->image;
+                    //dd($filename);
                     File::delete($filename);
                     $brands->image = '/upload/brands/' . $image;
                 }
@@ -141,7 +143,7 @@ class BrandController extends Controller
             }
             $brands->save();
 
-            return response()->json(['message' => UPDATE_SUCCESS], 200);
+            return response()->json(['message' => UPDATE_SUCCESS, 'results'=>$brands], 200);
         } catch (\Exception $e) {
             $errCode=$e->getCode();
             $errMgs=$e->getMessage();

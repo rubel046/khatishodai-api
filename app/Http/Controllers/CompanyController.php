@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Model\Company;
+use App\Model\CompanyCertificate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use DB;
@@ -31,10 +32,20 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:companies,name',
-            'web_url' => 'required|string|unique:companies,web_url',
-            'business_type_id' => 'required|numeric',
-            'address' => 'required|string',
+            'user_id' => 'required|numeric',
+            'name' => 'required|string|unique:company_basic_infos,name',
+            'display_name' => 'required|string',
+            'establishment_date' => 'required|date',
+            'office_space' => 'required|string',
+            'operation_address' => 'required|string',
+            'website' => 'required|string|unique:company_basic_infos,website',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'cell' => 'required|string',
+            'fax' => 'required|string',
+            'number_of_employee' => 'required|numeric',
+            'ownership_type' => 'required|numeric',
+            'turnover_id' => 'required|numeric',
             'status' => 'required|numeric'
         ]);
 
@@ -74,7 +85,7 @@ class CompanyController extends Controller
             $searchItem = $request->searchStr;
             $data = Company::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
-                ->orWhere('web_url', 'LIKE', "%{$searchItem}%")
+                ->orWhere('website', 'LIKE', "%{$searchItem}%")
                 ->get();
             if(!$data->isEmpty()){
                 return response()->json(['data' => $data,'message' => DATA_FOUND], 200);
@@ -93,8 +104,20 @@ class CompanyController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:companies,name,'.$id,
-            'web_url' => 'required|string|unique:companies,web_url,'.$id,
+            'name' => 'required|string|unique:company_basic_infos,name,'.$id,
+            'website' => 'required|string|unique:company_basic_infos,website,'.$id,
+            'user_id' => 'required|numeric',
+            'display_name' => 'required|string',
+            'establishment_date' => 'required|date',
+            'office_space' => 'required|string',
+            'operation_address' => 'required|string',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'cell' => 'required|string',
+            'fax' => 'required|string',
+            'number_of_employee' => 'required|numeric',
+            'ownership_type' => 'required|numeric',
+            'turnover_id' => 'required|numeric',
             'status' => 'required|numeric'
         ]);
 
@@ -108,7 +131,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             $errCode=$e->getCode();
             $errMgs=$e->getMessage();
-            return response()->json(['error code'=>$errCode,'message' => $errMgs ], 500);
+            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
         }
     }
 
@@ -122,7 +145,7 @@ class CompanyController extends Controller
 
             $errCode=$e->getCode();
             $errMgs=$e->getMessage();
-            return response()->json(['error code'=>$errCode,'message' => $errMgs ], 500);
+            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
         }
     }
 
