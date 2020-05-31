@@ -88,6 +88,39 @@ class BrandController extends Controller
             'sort_order' => 'required|numeric',
             'status' => 'required|numeric'
         ]);
+
+        try {
+            $data = $request->except('image');
+            $data['updated_by'] = 1;
+            $data['updated_at'] = Carbon::now();
+            $data['ip_address'] = $request->ip();
+            Brand::where('id', $id)->update($data);
+
+            $brands = Brand::findOrFail($id);
+            if ($request->hasFile('image')) {
+                $original_filename = $request->file('image')->getClientOriginalName();
+                $original_filename_arr = explode('.', $original_filename);
+                $file_ext = end($original_filename_arr);
+                $destination_path = './upload/brands/';
+                $image = $id.'-' . time() . '.' . $file_ext;
+
+                if ($request->file('image')->move($destination_path, $image)) {
+                    $filename = base_path().'/public/'.$brands->image;
+                    //dd($filename);
+                    File::delete($filename);
+                    $brands->image = '/upload/brands/' . $image;
+                }
+            } else {
+                $brands->image = '';
+            }
+            $brands->save();
+
+            return response()->json(['message' => UPDATE_SUCCESS, 'results'=>$brands], 200);
+        } catch (\Exception $e) {
+            $errCode=$e->getCode();
+            $errMgs=$e->getMessage();
+            return response()->json(['error code'=>$errCode,'message' => $errMgs ], 500);
+        }
     }
 
     private function uploadImage(Request $request)
