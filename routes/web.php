@@ -143,3 +143,91 @@ $router->group(['prefix' => 'menu_operations','middleware'=>'InputTrim'], functi
     $router->delete('{id}/delete','MenuOperationController@destroy');
 
 });
+
+// API route company certificates
+$router->group(['prefix' => 'comp_certificates','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyCertificateController@index');
+    $router->post('create', 'CompanyCertificateController@store');
+    $router->get('{id}/show', 'CompanyCertificateController@show');
+    $router->post('{id}/update','CompanyCertificateController@update');
+    $router->post('search','CompanyCertificateController@search');
+    $router->delete('{id}/delete','CompanyCertificateController@destroy');
+
+});
+
+// API route company Details
+$router->group(['prefix' => 'comp_details','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyDetailsController@index');
+    $router->post('create', 'CompanyDetailsController@store');
+    $router->get('{id}/show', 'CompanyDetailsController@show');
+    $router->post('{id}/update','CompanyDetailsController@update');
+    $router->post('search','CompanyDetailsController@search');
+    $router->delete('{id}/delete','CompanyDetailsController@destroy');
+
+});
+
+// API route company Factory
+$router->group(['prefix' => 'comp_factories','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyFactoriesController@index');
+    $router->post('create', 'CompanyFactoriesController@store');
+    $router->get('{id}/show', 'CompanyFactoriesController@show');
+    $router->post('{id}/update','CompanyFactoriesController@update');
+    $router->post('search','CompanyFactoriesController@search');
+    $router->delete('{id}/delete','CompanyFactoriesController@destroy');
+
+});
+
+// API route company Factory
+$router->group(['prefix' => 'comp_nearest_ports','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyNearestPortsController@index');
+    $router->post('create', 'CompanyNearestPortsController@store');
+    $router->get('{id}/show', 'CompanyNearestPortsController@show');
+    $router->post('{id}/update','CompanyNearestPortsController@update');
+    $router->post('search','CompanyNearestPortsController@search');
+    $router->delete('{id}/delete','CompanyNearestPortsController@destroy');
+
+});
+
+// API route company Photos
+$router->group(['prefix' => 'comp_photos','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyPhotosController@index');
+    $router->post('create', 'CompanyPhotosController@store');
+    $router->get('{id}/show', 'CompanyPhotosController@show');
+    $router->post('{id}/update','CompanyPhotosController@update');
+    $router->post('search','CompanyPhotosController@search');
+    $router->delete('{id}/delete','CompanyPhotosController@destroy');
+
+});
+
+// API route company Products
+$router->group(['prefix' => 'comp_products','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyProductsController@index');
+    $router->post('create', 'CompanyProductsController@store');
+    $router->get('{id}/show', 'CompanyProductsController@show');
+    $router->post('{id}/update','CompanyProductsController@update');
+    $router->post('search','CompanyProductsController@search');
+    $router->delete('{id}/delete','CompanyProductsController@destroy');
+
+});
+
+// API route company trade_infos
+$router->group(['prefix' => 'comp_trade_infos','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyTradeInfosController@index');
+    $router->post('create', 'CompanyTradeInfosController@store');
+    $router->get('{id}/show', 'CompanyTradeInfosController@show');
+    $router->post('{id}/update','CompanyTradeInfosController@update');
+    $router->post('search','CompanyTradeInfosController@search');
+    $router->delete('{id}/delete','CompanyTradeInfosController@destroy');
+
+});
+
+// API route company trade membership
+$router->group(['prefix' => 'comp_trade_memberships','middleware'=>'InputTrim'], function () use ($router) {
+    $router->get('list', 'CompanyTadeMembershipsController@index');
+    $router->post('create', 'CompanyTadeMembershipsController@store');
+    $router->get('{id}/show', 'CompanyTadeMembershipsController@show');
+    $router->post('{id}/update','CompanyTadeMembershipsController@update');
+    $router->post('search','CompanyTadeMembershipsController@search');
+    $router->delete('{id}/delete','CompanyTadeMembershipsController@destroy');
+
+});
