@@ -74,7 +74,8 @@ class BusinessTypeController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'name' => 'required|string' . $id ? '|unique:business_types,name, ' . $id : ''
+            'name' => 'required|string|unique:business_types,name' . ($id ? ', ' . $id : ''),
+            'status' => 'numeric'
         ]);
     }
 }

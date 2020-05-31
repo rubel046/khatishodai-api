@@ -74,7 +74,8 @@ class AttributeGroupController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'name' => 'required|string' . $id ? '|unique:attribute_groups,name, ' . $id : ''
+            'name' => 'required|string|unique:attribute_groups,name' . ($id ? ', ' . $id : ''),
+            'status' => 'numeric'
         ]);
     }
 }

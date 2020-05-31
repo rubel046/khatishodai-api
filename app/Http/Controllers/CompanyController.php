@@ -74,8 +74,8 @@ class CompanyController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'name' => 'required|string' . $id ? '|unique:company_basic_infos,name, ' . $id : '',
-            'website' => 'required|string' . $id ? '|unique:company_basic_infos,website, ' . $id : '',
+            'name' => 'required|string|unique:company_basic_infos,name' . ($id ? ', ' . $id : ''),
+            'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
             'user_id' => 'required|numeric',
             'display_name' => 'required|string',
             'establishment_date' => 'required|date',
@@ -88,7 +88,7 @@ class CompanyController extends Controller
             'number_of_employee' => 'required|numeric',
             'ownership_type' => 'required|numeric',
             'turnover_id' => 'required|numeric',
-            'status' => 'required|numeric',
+            'status' => 'numeric',
         ]);
     }
 
