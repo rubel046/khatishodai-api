@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
-class CreateMenuItemsTable extends Migration
+
+class CreatePageInfosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,11 +19,11 @@ class CreateMenuItemsTable extends Migration
         $schema->blueprintResolver(function ($table, $callback) {
             return new CustomBlueprint($table, $callback);
         });
-        $schema->create('menu__items', function (CustomBlueprint $table) {
+
+        $schema->create('page_infos', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('parent_id')->nullable()->unsigned();
-            $table->string('name', 150)->nullable();
-            $table->string('description', 255)->nullable();
+            $table->string('name',100);
+            $table->integer('menu_id');
             $table->commonFields();
         });
     }
@@ -34,6 +35,6 @@ class CreateMenuItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('menu__items');
+        Schema::dropIfExists('page_infos');
     }
 }

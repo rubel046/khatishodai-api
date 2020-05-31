@@ -20,7 +20,7 @@ class CreateCountriesTable extends Migration
         });
         $schema->create('countries', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('name')->nullable()->unsigned();
+            $table->string('name',100);
             $table->string('code',100)->nullable();
             $table->string('code_a3',100)->nullable();
             $table->string('code_n3',200)->nullable();

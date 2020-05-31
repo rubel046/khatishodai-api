@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
-class CreateUserPrivilegesTable extends Migration
+
+class CreateProductRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -19,11 +20,11 @@ class CreateUserPrivilegesTable extends Migration
             return new CustomBlueprint($table, $callback);
         });
 
-        $schema->create('user__privileges', function (CustomBlueprint $table) {
+        $schema->create('product_ratings', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable()->unsigned();
-            $table->integer('menu_id')->nullable()->unsigned();
-            $table->integer('operation_ids')->nullable()->unsigned();
+            $table->productId();
+            $table->string('review_text',200);
+            $table->smallInteger('rating');
             $table->commonFields();
         });
     }
@@ -35,6 +36,6 @@ class CreateUserPrivilegesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user__privileges');
+        Schema::dropIfExists('product_ratings');
     }
 }

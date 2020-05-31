@@ -25,7 +25,8 @@ class CreateBrandsTable extends Migration
             $table->string('name',100);
             $table->string('code',100)->nullable();
             $table->string('image',100)->nullable();
-            $table->integer('sort_order');
+            $table->integer('rank')->nullable();
+            $table->integer('sort_order')->nullable();
             $table->commonFields();
         });
     }

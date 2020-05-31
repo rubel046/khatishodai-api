@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
+use App\Repositories\Repository;
 
 class UserController extends Controller
 {
@@ -13,9 +14,12 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    private $model;
+
+    public function __construct(User $user)
     {
         $this->middleware('auth');
+        $this->model = new Repository($user);
     }
 
     /**
@@ -33,9 +37,9 @@ class UserController extends Controller
      *
      * @return Response
      */
-    public function allUsers()
+    public function index()
     {
-        return response()->json(['users' =>  User::all()], 200);
+        return $this->model->paginate();
     }
 
     /**
@@ -43,35 +47,29 @@ class UserController extends Controller
      *
      * @return Response
      */
-    public function singleUser($id)
+    public function show($id)
     {
-        try {
-            $user = User::findOrFail($id);
-
-            return response()->json(['user' => $user], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => 'User not found!'], 404);
-        }
+        return $this->model->show($id);
 
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
         return response()->json(['message' => 'Logout'], 200);
     }
 
 
     //send email
-    public function sendEmail() {
-        $to_name="Shamim reza";
-        $to_email="mrezashamim@gmail.com";
-        $data=[
-            'name'=>'Jhone due',
-            'body'=>'test email body'
+    public function sendEmail()
+    {
+        $to_name = "Shamim reza";
+        $to_email = "mrezashamim@gmail.com";
+        $data = [
+            'name' => 'Jhone due',
+            'body' => 'test email body'
         ];
-        Mail::send('mail.test_mail',$data,function($message) use ($to_name,$to_email){
+        Mail::send('mail.test_mail', $data, function ($message) use ($to_name, $to_email) {
             $message->to($to_email)->subject('Tizaara api email test');
         });
         echo 'success!';
