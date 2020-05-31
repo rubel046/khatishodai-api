@@ -67,8 +67,8 @@ class Repository implements RepositoryInterface
             $record = $this->model->findOrFail($id);
             $data['updated_by'] = auth()->id();
             $data['ip_address'] = request()->ip();
-
-            return $this->updatedSuccess($record->update($data));
+            $record->update($data);
+            return $this->updatedSuccess($record);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
