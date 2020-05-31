@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class AttributeGroup extends Model
 {
     use SoftDeletes;
-    //
+    protected $guarded = [];
 
 
     public function attribute()

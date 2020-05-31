@@ -30,9 +30,9 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
     $router->post('logout', 'AuthController@logout');
     $router->get('profile', 'UserController@profile');
-    $router->get('users/{id}', 'UserController@singleUser');
-    $router->get('{id}/show', 'UserController@singleUser');
-    $router->get('list', 'UserController@allUsers');
+    $router->get('users/{id}', 'UserController@show');
+    $router->get('{id}/show', 'UserController@show');
+    $router->get('list', 'UserController@index');
     $router->post('verify-otp', 'AuthController@verifyOtp');
     $router->get('test-otp/{phone}', 'AuthController@testOtp');
 

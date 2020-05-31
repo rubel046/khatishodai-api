@@ -3,64 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Model\CompanyProduct;
-use Carbon\Carbon;
+use App\Repositories\Repository;
 use Illuminate\Http\Request;
 
 class CompanyProductsController extends Controller
 {
-    public function __construct()
+    private $model;
+
+    public function __construct(CompanyProduct $model)
     {
         $this->middleware('auth');
+        $this->model = new Repository($model);
     }
 
     public function index()
     {
-        $resutls= CompanyProduct::paginate(PER_PAGE);
-        $items=$resutls->items();
-        $meta=[
-            'per_page'=> $resutls->perPage(),
-            'total_page'=> $resutls->lastPage(),
-            'total_item'=> $resutls->total(),
-            'current_page'=> $resutls->currentPage()
-        ];
-        return response()->json(['results' => $items,'meta'=>$meta], 200);
+        return $this->model->paginate();
     }
 
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'company_id' => 'required|numeric',
-            'name' => 'required|string',
-            'is_main' => 'required|numeric',
-            'status' => 'required|numeric',
-            'created_by' => 'sometimes|numeric',
-        ]);
-
-        try {
-            $postData = $request->all();
-            $postData['ip_address'] = $request->ip();
-            $compData= CompanyProduct::create($postData);
-
-            return response()->json(['data' => $compData, 'message' => SAVE_SUCCESS], 201);
-        } catch (\Exception $e) {
-            $errMgs = $e->getMessage();
-            return response()->json(['message' => $errMgs], 409);
-        }
+        $this->validation($request);
+        return $this->model->create($request->all());
     }
+
 
 
     public function show($id)
     {
-        try {
-            $data = CompanyProduct::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => NO_DATA], 500);
-        }
+        return $this->model->show($id);
     }
 
 
@@ -90,42 +62,24 @@ class CompanyProductsController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'company_id' => 'required|numeric',
-            'name' => 'required|string',
-            'is_main' => 'required|numeric',
-            'status' => 'required|numeric',
-            'updated_by' => 'sometimes|numeric',
-        ]);
-
-        try {
-            $data=$request->all();
-            //$data['updated_at'] = Carbon::now();
-            $data['ip_address'] = $request->ip();
-            CompanyProduct::where('id', $id)->update($data);
-            $compData = CompanyProduct::findOrFail($id);
-
-            return response()->json(['message' => UPDATE_SUCCESS,'results'=>$compData], 200);
-        } catch (\Exception $e) {
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
-        }
+        $this->validation($request, $id);
+        return $this->model->update($request->all(), $id);
     }
 
 
     public function destroy($id)
     {
-        try {
-            CompanyProduct::findOrFail($id)->delete();
-            return response()->json(['message' => DELETE_SUCCESS], 200);
+        return $this->model->delete($id);
+    }
 
-        } catch (\Exception $e) {
-
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
-        }
+    private function validation(Request $request, $id = false)
+    {
+        $this->validate($request, [
+            'company_id' => 'required|numeric',
+            'name' => 'required|string',
+            'is_main' => 'required|numeric',
+            'status' => 'required|numeric',
+        ]);
     }
 
 }
