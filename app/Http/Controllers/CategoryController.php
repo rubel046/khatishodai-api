@@ -25,7 +25,11 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $this->validation($request);
-        return $this->model->create($request->all());
+
+        $data = $request->all();
+        $data['image'] = $this->uploadImage($request);
+
+        return $this->model->create($data);
     }
 
 
@@ -60,7 +64,10 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
-        return $this->model->update($request->all(), $id);
+        $data = $request->all();
+        $data['image'] = $this->uploadImage($request);
+
+        return $this->model->update($data, $id);
     }
 
 
@@ -73,9 +80,25 @@ class CategoryController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|unique:categories,name' . ($id ? ', ' . $id : ''),
-            'parent_id' => 'required|numeric',
-            'rank' => 'required|string'
+            'parent_id' => 'numeric',
+            'description' => 'string',
+            'image' => 'image|mimes:jpeg,png,jpg|max:512',
+            'rank' => 'required|numeric'
         ]);
+    }
+
+    private function uploadImage(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $file_ext = $request->file('image')->clientExtension();
+            $destination_path = base_path('public/upload/category');
+            $image = uniqid() . '-' . time() . '.' . $file_ext;
+
+            if ($request->file('image')->move($destination_path, $image)) {
+                return '/upload/category/' . $image;
+            }
+        }
+        return null;
     }
 
 }
