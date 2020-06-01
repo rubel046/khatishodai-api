@@ -21,11 +21,11 @@ class CreateCategoriesTable extends Migration
         
         $schema->create('categories', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('parent_id');
+            $table->integer('parent_id')->nullable();
             $table->string('name',150);
             $table->string('image',150)->nullable();
             $table->mediumText('description')->nullable();
-            $table->smallInteger('rank'); 
+            $table->smallInteger('rank');
             $table->commonFields();
         });
     }
