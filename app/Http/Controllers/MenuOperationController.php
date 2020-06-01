@@ -3,74 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Model\Operations;
-use Carbon\Carbon;
+use App\Repositories\Repository;
 use Illuminate\Http\Request;
 
 class MenuOperationController extends Controller
 {
-    public function __construct()
+    private $model;
+
+    public function __construct(Operations $model)
     {
         $this->middleware('auth');
+        $this->model = new Repository($model);
     }
 
     public function index()
     {
-        $resutls= Operations::paginate(PER_PAGE);
-        $items=$resutls->items();
-        $meta=[
-            'per_page'=> $resutls->perPage(),
-            'total_page'=> $resutls->lastPage(),
-            'total_item'=> $resutls->total(),
-            'current_page'=> $resutls->currentPage()
-        ];
-        return response()->json(['results' => $items,'meta'=>$meta], 200);
+        return $this->model->paginate();
     }
 
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|unique:operations'
-        ]);
-
-        try {
-            $postData=$request->all();
-            $postData['ip_address']=$request->ip();
-            $data= Operations::create($postData);
-            return response()->json(['data' => $data, 'message' => 'Created successfully!'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error found',], 409);
-        }
+        $this->validation($request);
+        return $this->model->create($request->all());
     }
 
 
     public function show($id)
     {
-        try {
-            $data = Operations::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => 'Data not found!'], 404);
-        }
+        return $this->model->show($id);
     }
 
 
     public function search(Request $request)
     {
-        $this->validate($request,['searchStr'=>'required|string']);
+        $this->validate($request, ['searchStr' => 'required|string']);
         try {
             $searchItem = $request->searchStr;
             $data = Operations::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
                 ->get();
-                
-            if(!$data->isEmpty()){
-                return response()->json(['datas' => $data,'message' => 'Result  with this query'], 200);
-            }else{
-                return response()->json(['datas' => $data,'message' => 'No data found!'], 404);
+
+            if (!$data->isEmpty()) {
+                return response()->json(['datas' => $data, 'message' => 'Result  with this query'], 200);
+            } else {
+                return response()->json(['datas' => $data, 'message' => 'No data found!'], 404);
             }
 
 
@@ -83,37 +60,22 @@ class MenuOperationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required|string|unique:operations'
-        ]);
-
-        try {
-            $data = $request->all();
-            $data['updated_by'] = 1;
-            $data['updated_at'] = Carbon::now();
-            $data['ip_address'] = $request->ip();
-            Operations::where('id', $id)->update($request->all());
-            return response()->json(['message' => 'Data updated successfully'], 200);
-        } catch (\Exception $e) {
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['error code'=>$errCode,'message' => $errMgs ], 500);
-        }
+        $this->validation($request, $id);
+        return $this->model->update($request->all(), $id);
     }
 
 
     public function destroy($id)
     {
-        try {
-            Operations::findOrFail($id)->delete();
-            return response()->json(['message' => 'Data deleted successfully'], 200);
+        return $this->model->delete($id);
+    }
 
-        } catch (\Exception $e) {
-
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['error code'=>$errCode,'message' => $errMgs ], 500);
-        }
+    private function validation(Request $request, $id = false)
+    {
+        $this->validate($request, [
+            'name' => 'required|string|unique:operations,name' . ($id ? ', ' . $id : ''),
+            'status' => 'required|numeric'
+        ]);
     }
 
 }

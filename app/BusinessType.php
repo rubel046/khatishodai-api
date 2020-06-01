@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BusinessType extends Model
 {
     use SoftDeletes;
+    protected $guarded = [];
 
-    //
 }

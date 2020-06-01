@@ -3,78 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Model\CompanyPhoto;
-use Carbon\Carbon;
+use App\Repositories\Repository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 
 class CompanyPhotosController extends Controller
 {
-    public function __construct()
+    private $model;
+
+    public function __construct(CompanyPhoto $model)
     {
         $this->middleware('auth');
+        $this->model = new Repository($model);
     }
 
     public function index()
     {
-        $resutls= CompanyPhoto::paginate(PER_PAGE);
-        $items=$resutls->items();
-        $meta=[
-            'per_page'=> $resutls->perPage(),
-            'total_page'=> $resutls->lastPage(),
-            'total_item'=> $resutls->total(),
-            'current_page'=> $resutls->currentPage()
-        ];
-        return response()->json(['results' => $items,'meta'=>$meta], 200);
+        return $this->model->paginate();
     }
 
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'company_id' => 'required|numeric',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:512',
-            'status' =>  'required|numeric',
-            'created_by' => 'sometimes|numeric',
-        ]);
+        $this->validation($request);
 
-        try {
-            $postData=$request->except('photo');
-            $postData['ip_address']=$request->ip();
-            $compData= CompanyPhoto::create($postData);
-            if ($request->hasFile('photo')) {
-                $original_filename = $request->file('photo')->getClientOriginalName();
-                $original_filename_arr = explode('.', $original_filename);
-                $file_ext = end($original_filename_arr);
-                $destination_path = './upload/company_photo/';
-                $image = $compData->id.'-' . time() . '.' . $file_ext;
+        $data = $request->all();
+        $data['photo'] = $this->uploadImage($request);
 
-                if ($request->file('photo')->move($destination_path, $image)) {
-                    $compData->photo = '/upload/company_photo/' . $image;
-                }
-            } else {
-                $compData->photo ='';
-            }
-            $compData->save();
-
-            return response()->json(['data' => $compData, 'message' => SAVE_SUCCESS], 201);
-        } catch (\Exception $e) {
-            $errMgs = $e->getMessage();
-            return response()->json(['message' => $errMgs], 409);
-        }
+        return $this->model->create($data);
     }
 
 
     public function show($id)
     {
-        try {
-            $data = CompanyPhoto::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => NO_DATA], 500);
-        }
+        return $this->model->show($id);
     }
 
 
@@ -104,57 +65,39 @@ class CompanyPhotosController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'company_id' => 'required|numeric',
-            'photo' => 'sometimes|image|mimes:jpeg,png,jpg|max:512',
-            'status' =>  'required|numeric',
-            'updated_by' => 'sometimes|numeric',
-        ]);
+        $this->validation($request, $id);
+        $data = $request->all();
+        $data['photo'] = $this->uploadImage($request);
 
-        try {
-            $data = $request->except('photo');
-            $data['ip_address'] = $request->ip();
-            CompanyPhoto::where('id', $id)->update($data);
-
-            $compData = CompanyPhoto::findOrFail($id);
-            if ($request->hasFile('photo')) {
-                $original_filename = $request->file('photo')->getClientOriginalName();
-                $original_filename_arr = explode('.', $original_filename);
-                $file_ext = end($original_filename_arr);
-                $destination_path = './upload/company_photo/';
-                $image = $id.'-' . time() . '.' . $file_ext;
-
-                if ($request->file('photo')->move($destination_path, $image)) {
-                    $filename = base_path().'/public/'.$compData->photo;
-                    File::delete($filename);
-                    $compData->photo = '/upload/company_photo/' . $image;
-                }
-            } else {
-                $compData->photo = '';
-            }
-            $compData->save();
-
-            return response()->json(['message' => UPDATE_SUCCESS,'results'=>$compData], 200);
-        } catch (\Exception $e) {
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
-        }
+        return $this->model->update($data, $id);
     }
 
 
     public function destroy($id)
     {
-        try {
-            CompanyPhoto::findOrFail($id)->delete();
-            return response()->json(['message' => DELETE_SUCCESS], 200);
+        return $this->model->delete($id);
+    }
 
-        } catch (\Exception $e) {
+    private function validation(Request $request, $id = false)
+    {
+        $this->validate($request, [
+            'company_id' => 'required|numeric',
+            'photo' => 'sometimes|image|mimes:jpeg,png,jpg|max:512',
+            'status' =>  'required|numeric',
+        ]);
+    }
+    private function uploadImage(Request $request)
+    {
+        if ($request->hasFile('photo')) {
+            $file_ext = $request->file('photo')->clientExtension();
+            $destination_path = base_path('public/upload/company_photo');
+            $image = uniqid() . '-' . time() . '.' . $file_ext;
 
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
+            if ($request->file('photo')->move($destination_path, $image)) {
+                return '/upload/company_photo/' . $image;
+            }
         }
+        return null;
     }
 
 }

@@ -3,78 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Model\Company;
-use App\Model\CompanyCertificate;
-use Carbon\Carbon;
+use App\Repositories\Repository;
 use Illuminate\Http\Request;
-use DB;
 
 class CompanyController extends Controller
 {
-    public function __construct()
+    private $model;
+
+    public function __construct(Company $company)
     {
         $this->middleware('auth');
+        $this->model = new Repository($company);
     }
 
     public function index()
     {
-        $resutls= Company::paginate(PER_PAGE);
-        $items=$resutls->items();
-        $meta=[
-           'per_page'=> $resutls->perPage(),
-           'total_page'=> $resutls->lastPage(),
-           'total_item'=> $resutls->total(),
-           'current_page'=> $resutls->currentPage()
-        ];
-        return response()->json(['results' => $items,'meta'=>$meta], 200);
+        return $this->model->paginate();
     }
 
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'user_id' => 'required|numeric',
-            'name' => 'required|string|unique:company_basic_infos,name',
-            'display_name' => 'required|string',
-            'establishment_date' => 'required|date',
-            'office_space' => 'required|string',
-            'operation_address' => 'required|string',
-            'website' => 'required|string|unique:company_basic_infos,website',
-            'email' => 'required|email',
-            'phone' => 'required|string',
-            'cell' => 'required|string',
-            'fax' => 'required|string',
-            'number_of_employee' => 'required|numeric',
-            'ownership_type' => 'required|numeric',
-            'turnover_id' => 'required|numeric',
-            'status' => 'required|numeric'
-        ]);
-
-        try {
-
-            $postData=$request->all();
-            $postData['ip_address']=$request->ip();
-            $data= Company::create($postData);
-            $data->ip_address = $request->ip();
-            $data->save();
-            return response()->json(['data' => $data, 'message' => SAVE_SUCCESS], 201);
-
-        } catch (\Exception $e) {
-            return response()->json(['message' => ERROR_MSG,], 409);
-        }
+        $this->validation($request);
+        return $this->model->create($request->all());
     }
 
 
     public function show($id)
     {
-        try {
-            $data = Company::findOrFail($id);
-
-            return response()->json(['data' => $data], 200);
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => ERROR_MSG], 404);
-        }
+        return $this->model->show($id);
     }
 
 
@@ -101,11 +58,24 @@ class CompanyController extends Controller
 
     }
 
+
     public function update(Request $request, $id)
     {
+        $this->validation($request, $id);
+        return $this->model->update($request->all(), $id);
+    }
+
+
+    public function destroy($id)
+    {
+        return $this->model->delete($id);
+    }
+
+    private function validation(Request $request, $id = false)
+    {
         $this->validate($request, [
-            'name' => 'required|string|unique:company_basic_infos,name,'.$id,
-            'website' => 'required|string|unique:company_basic_infos,website,'.$id,
+            'name' => 'required|string|unique:company_basic_infos,name' . ($id ? ', ' . $id : ''),
+            'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
             'user_id' => 'required|numeric',
             'display_name' => 'required|string',
             'establishment_date' => 'required|date',
@@ -118,35 +88,8 @@ class CompanyController extends Controller
             'number_of_employee' => 'required|numeric',
             'ownership_type' => 'required|numeric',
             'turnover_id' => 'required|numeric',
-            'status' => 'required|numeric'
+            'status' => 'numeric',
         ]);
-
-        try {
-            $data = $request->all();
-            $data['updated_by'] = 1;
-            $data['updated_at'] = Carbon::now();
-            $data['ip_address'] = $request->ip();
-            Company::where('id', $id)->update($request->all());
-            return response()->json(['message' => UPDATE_SUCCESS], 200);
-        } catch (\Exception $e) {
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
-        }
-    }
-
-
-    public function destroy($id)
-    {
-        try {
-            Company::findOrFail($id)->delete();
-            return response()->json(['message' => DELETE_SUCCESS], 200);
-        } catch (\Exception $e) {
-
-            $errCode=$e->getCode();
-            $errMgs=$e->getMessage();
-            return response()->json(['errorCode'=>$errCode,'message' => $errMgs ], 500);
-        }
     }
 
 }

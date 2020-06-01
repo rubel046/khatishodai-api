@@ -3,64 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\BusinessType;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Repositories\Repository;
+
 
 class BusinessTypeController extends Controller
 {
-    public function __construct()
+    private $model;
+
+    public function __construct(BusinessType $businessType)
     {
         $this->middleware('auth');
+        $this->model = new Repository($businessType);
     }
 
     public function index()
     {
-        $resutls= BusinessType::paginate(PER_PAGE);
-        $items=$resutls->items();
-        $meta=[
-            'per_page'=> $resutls->perPage(),
-            'total_page'=> $resutls->lastPage(),
-            'total_item'=> $resutls->total(),
-            'current_page'=> $resutls->currentPage()
-        ];
-        return response()->json(['results' => $items,'meta'=>$meta], 200);
+        return $this->model->paginate();
     }
 
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|unique:business_types'
-        ]);
-
-        try {
-            $btyps = new BusinessType;
-
-            $btyps->name = $request->name;
-            $btyps->ip_address = $request->ip();
-            $btyps->save();
-            return response()->json(['btypes' => $btyps, 'message' => 'Created successfully!'], 201);
-
-        } catch (\Exception $e) {
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 409);
-        }
+        $this->validation($request);
+        return $this->model->create($request->all());
     }
 
 
     public function show($id)
     {
-        try {
-            $bTypes = BusinessType::findOrFail($id);
-
-            return response()->json(['btypes' => $bTypes], 200);
-
-        } catch (\Exception $e) {
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
-        }
+        return $this->model->show($id);
     }
 
 
@@ -89,36 +61,21 @@ class BusinessTypeController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required|string|unique:business_types,name,' . $id
-        ]);
-
-        try {
-            $data = $request->all();
-            $data['updated_by'] = 1;
-            $data['updated_at'] = Carbon::now();
-            $data['ip_address'] = $request->ip();
-            BusinessType::where('id', $id)->update($request->all());
-            return response()->json(['message' => 'Data updated successfully'], 200);
-        } catch (\Exception $e) {
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
-        }
+        $this->validation($request, $id);
+        return $this->model->update($request->all(), $id);
     }
 
 
     public function destroy($id)
     {
-        try {
-            BusinessType::findOrFail($id)->delete();
-            return response()->json(['message' => 'Data deleted successfully'], 200);
+        return $this->model->delete($id);
+    }
 
-        } catch (\Exception $e) {
-
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
-        }
+    private function validation(Request $request, $id = false)
+    {
+        $this->validate($request, [
+            'name' => 'required|string|unique:business_types,name' . ($id ? ', ' . $id : ''),
+            'status' => 'numeric'
+        ]);
     }
 }
