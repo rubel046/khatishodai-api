@@ -8,6 +8,7 @@ use App\Http\Helper\CommonHelper;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
+use Laravel\Socialite\Facades\Socialite;
 use Validator;
 
 class AuthController extends Controller
@@ -15,7 +16,7 @@ class AuthController extends Controller
     /**
      * Store a new user.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      */
     public function register(Request $request)
@@ -33,26 +34,26 @@ class AuthController extends Controller
             'companyName' => 'required|string',
         ]);
 
-       // return response()->json(['test'=> rand(100000,999999)]);
+        // return response()->json(['test'=> rand(100000,999999)]);
         if ($validator->fails()) {
-            return response()->json(['errors'=>$validator->errors(),'messages'=>'User registration failed, Data not save to record.'], 422);
+            return response()->json(['errors' => $validator->errors(), 'messages' => 'User registration failed, Data not save to record.'], 422);
         }
         $login = $this->findLoginWith($request->emailOrPhone);
 
         $email = $phone = null;
-        if ($login =='email'){
+        if ($login == 'email') {
             $email = $request->input('emailOrPhone');
             $validator = Validator::make($request->all(), [
                 'emailOrPhone' => 'email|unique:users,email',
-            ],[
+            ], [
                 'emailOrPhone.email' => 'Invalid email or Phone Number',
                 'emailOrPhone.unique' => 'The email is already taken'
             ]);
-        }else{
+        } else {
             $phone = $request->input('emailOrPhone');
             $validator = Validator::make($request->all(), [
                 'emailOrPhone' => 'numeric|digits:11|unique:users,phone',
-            ],[
+            ], [
                 'emailOrPhone.numeric' => 'Invalid email or Phone Number',
                 'emailOrPhone.unique' => 'The phone number is already taken',
                 'emailOrPhone.digits' => 'The phone number must be 11 digits'
@@ -61,7 +62,7 @@ class AuthController extends Controller
         }
 
         if ($validator->fails()) {
-            return response()->json(['errors'=>$validator->errors(),'messages'=>'Operation Not success!'], 422);
+            return response()->json(['errors' => $validator->errors(), 'messages' => 'Operation Not success!'], 422);
         }
 
         try {
@@ -80,7 +81,7 @@ class AuthController extends Controller
             $toName = $user->first_name . ' ' . $user->last_name;
 
             if ($email) {
-                $user->verificationToken =  CommonHelper::strRandom(40);
+                $user->verificationToken = CommonHelper::strRandom(40);
                 $toEmail = $email;
                 $data = [
                     'id' => $user->id,
@@ -89,7 +90,7 @@ class AuthController extends Controller
                     'verificationToken' => $user->verificationToken
                 ];
                 $user->save();
-                try{
+                try {
                     // sending verification Email
                     Mail::send('mail.reg_verification_email', $data, function ($message) use ($toName, $toEmail) {
                         $message->to($toEmail)->subject('Tizaara Registration Verification');
@@ -99,8 +100,8 @@ class AuthController extends Controller
                     return response()->json([
                         'user' => $data,
                         'signUpBy' => 'email',
-                        'message' => 'Registration form submitted successfully, Please check email '.$email.' to verify your account!'], 201);
-                }catch (\Exception $e){
+                        'message' => 'Registration form submitted successfully, Please check email ' . $email . ' to verify your account!'], 201);
+                } catch (\Exception $e) {
                     return response()->json(['messages' => 'Registration form submitted successfully!, Email sending failed. Contact with admin'], 409);
                 }
 
@@ -113,32 +114,33 @@ class AuthController extends Controller
 
                 $verificationToken = rand(100000, 999999);
                 // save or update otp
-                $user->verificationToken=$verificationToken;
+                $user->verificationToken = $verificationToken;
                 $user->save();
-                 /*User::updateOrCreate(
-                    ['phonea' => $phone],
-                    ['verificationToken' => $verificationToken ]
-                );*/
+                /*User::updateOrCreate(
+                   ['phonea' => $phone],
+                   ['verificationToken' => $verificationToken ]
+               );*/
 
-                try{
+                try {
                     // Sending Mobile OTP
-                    if($this->checkOtpSent($phone)==0){
+                    if ($this->checkOtpSent($phone) == 0) {
                         //$otp = mt_rand(100000, 999999);
-                        $message = "Your tizaara mobile verification OTP code is ".$verificationToken;
-                        $post_url = 'https://portal.smsinbd.com/smsapi/' ;
+                        $message = "Your tizaara mobile verification OTP code is " . $verificationToken;
+                        $post_url = 'https://portal.smsinbd.com/smsapi/';
                         $post_values = array(
                             'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
                             'type' => 'text',  // unicode or text
                             'senderid' => '8801552146120',
-                            'contacts' => '88'.$phone,
+                            'contacts' => '88' . $phone,
                             'msg' => $message,
                             'method' => 'api'
                         );
 
                         $post_string = "";
-                        foreach( $post_values as $key => $value )
-                        { $post_string .= "$key=" . urlencode( $value ) . "&"; }
-                        $post_string = rtrim( $post_string, "& " );
+                        foreach ($post_values as $key => $value) {
+                            $post_string .= "$key=" . urlencode($value) . "&";
+                        }
+                        $post_string = rtrim($post_string, "& ");
 
 
                         $request = curl_init($post_url);
@@ -147,22 +149,22 @@ class AuthController extends Controller
                         curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
                         curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
                         $post_response = curl_exec($request);
-                        curl_close ($request);
+                        curl_close($request);
 
-                        $responses=array();
-                        $array =  json_decode( preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true );
+                        $responses = array();
+                        $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
 
-                       /* if($array){
-                            echo $array['status'] ;
-                            echo $array['CamID'] ;
-                            dd($array);
-                        }*/
+                        /* if($array){
+                             echo $array['status'] ;
+                             echo $array['CamID'] ;
+                             dd($array);
+                         }*/
                     }
                     return response()->json([
                         'user' => $data,
                         'signUpBy' => 'phone',
-                        'message' => 'Registration form submitted successfully. Please, Check your mobile '.$phone.' for verification OTP to verify'], 201);
-                }catch (\Exception $e){
+                        'message' => 'Registration form submitted successfully. Please, Check your mobile ' . $phone . ' for verification OTP to verify'], 201);
+                } catch (\Exception $e) {
                     return response()->json(['messages' => 'Registration form submitted successfully!, Mobile OTP sending failed. Contact with admin'], 409);
                 }
 
@@ -179,7 +181,7 @@ class AuthController extends Controller
     /**
      * Get a JWT via given credentials.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      */
     public function login(Request $request)
@@ -191,7 +193,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors'=>$validator->errors()], 422);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         //$credentials = $request->only(['email', 'password']);
@@ -213,10 +215,20 @@ class AuthController extends Controller
         // set Expiry TTL
         // $credentials, ['exp' => Carbon\Carbon::now()->addDays(7)->timestamp]
         if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
-            return response()->json(['errors'=>['message' => 'User Not Found | Unauthorized']], 404);
+            return response()->json(['errors' => ['message' => 'User Not Found | Unauthorized']], 404);
         }
 
         return $this->respondWithToken($token);
+    }
+
+    public function socialLogin($provider)
+    {
+        return Socialite::with($provider)->stateless()->redirect();
+    }
+
+    public function handleProviderCallback($provider)
+    {
+        return $user = Socialite::driver($provider)->user();
     }
 
     public function logout()
@@ -249,7 +261,8 @@ class AuthController extends Controller
             Mail::send('mail.verified_success_email', $data, function ($message) use ($toName, $toEmail) {
                 $message->to($toEmail)->subject('Tizaara Registration Verification Success!');
             });
-            echo 'Verification email is success! Click to login <a href="http://www.web.tizaara.com/account/login">www.tizaara.com/account/login</a>'; return;
+            echo 'Verification email is success! Click to login <a href="http://www.web.tizaara.com/account/login">www.tizaara.com/account/login</a>';
+            return;
             return View('signup_verify_success');
             return 'Verification email is success!';
 
@@ -305,7 +318,7 @@ class AuthController extends Controller
 
             // sms in bd api
             //https://portal.smsinbd.com/smsapi?api_key=b1af6725e5e788d3e3096803f5953ef913c56873&type=text&contacts=8801814111176&senderid=8801552146120&msg=test&method=api
-            $post_url = 'https://portal.smsinbd.com/smsapi/' ;
+            $post_url = 'https://portal.smsinbd.com/smsapi/';
             $post_values = array(
                 'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
                 'type' => 'text',  // unicode or text
@@ -316,9 +329,10 @@ class AuthController extends Controller
             );
 
             $post_string = "";
-            foreach( $post_values as $key => $value )
-            { $post_string .= "$key=" . urlencode( $value ) . "&"; }
-            $post_string = rtrim( $post_string, "& " );
+            foreach ($post_values as $key => $value) {
+                $post_string .= "$key=" . urlencode($value) . "&";
+            }
+            $post_string = rtrim($post_string, "& ");
 
             $request = curl_init();
             curl_setopt($request, CURLOPT_URL, $post_url);
@@ -329,15 +343,15 @@ class AuthController extends Controller
             curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query($post_values));
             curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
             $post_response = curl_exec($request);
-            curl_close ($request);
+            curl_close($request);
             dd($post_response);
-            $responses=array();
-            $array =  json_decode( preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true );
+            $responses = array();
+            $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
 
-            if($array){
-                echo $array['status'] ;
+            if ($array) {
+                echo $array['status'];
 
-                echo $array['CamID'] ;
+                echo $array['CamID'];
 
                 print_r($array);
             }
@@ -346,42 +360,42 @@ class AuthController extends Controller
 
 
             // greenweb sms
-            $otp = $verificationToken = rand(100000,999999);
+            $otp = $verificationToken = rand(100000, 999999);
             $to = $phone;//'01814111176' ;
             $token = "82445cfa4e41f7df23807a144bbcdae6";
-            $message = "Your test mobile verification OTP code is ".$otp;
+            $message = "Your test mobile verification OTP code is " . $otp;
 
             $url = "http://api.greenweb.com.bd/api.php";
             // $mobileOtp=new Mobile_otp();
 
-            $data= array(
-                'to'=>"$to",
-                'message'=>"$message",
-                'token'=>"$token"
+            $data = array(
+                'to' => "$to",
+                'message' => "$message",
+                'token' => "$token"
             );
             // Add parameters in key value
             $ch = curl_init(); // Initialize cURL
-            curl_setopt($ch, CURLOPT_URL,$url);
+            curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_ENCODING, '');
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $smsResult =curl_exec($ch);
-            $status=explode(':',$smsResult)[0];
-             dd($status);
-            if($smsResult!==false){
-                if($status!='Error' ){
+            $smsResult = curl_exec($ch);
+            $status = explode(':', $smsResult)[0];
+            dd($status);
+            if ($smsResult !== false) {
+                if ($status != 'Error') {
                     // save or update otp
                     User::updateOrCreate(
                         ['phone' => $phone],
-                        [ 'verificationToken' => $otp ]
+                        ['verificationToken' => $otp]
                     );
                     die(' sent');
-                }else{
-                    Session::flash('error','Transaction is Falied');
+                } else {
+                    Session::flash('error', 'Transaction is Falied');
                     return redirect()->back()->withErrors(['contact_no' => ['Invalid mobile No, check your contact number correctly']])->withInput();
                 }
-            }else{
-                Session::flash('error','Transaction is Falied');
+            } else {
+                Session::flash('error', 'Transaction is Falied');
                 return redirect()->back()->withErrors(['contact_no' => ['Connection Problem']])->withInput();
             }
         }
@@ -389,20 +403,21 @@ class AuthController extends Controller
     }
 
 
-    public function checkOtpSent($phone){
+    public function checkOtpSent($phone)
+    {
         $response = 0;
         $nowDate = date('Y-m-d');
-        $data = User::whereDate('created_at','=',$nowDate)
+        $data = User::whereDate('created_at', '=', $nowDate)
             ->where('phone', 'LIKE', "%$phone%")
             ->where('is_verified', '=', "0")
             ->first();
-        if( !empty($data)){
+        if (!empty($data)) {
             // $nowDate = date('Y-m-d H:i:s');
             $date1 = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $data->updated_at)->timestamp;
             $date2 = \Carbon\Carbon::createFromFormat('Y-m-d', $nowDate)->timestamp;
             $diff = $date2 - $date1;
             if ($diff < 3601) {// if attempt within 60 min 3601
-                $response= 1;
+                $response = 1;
             }
         }
         //dd($data);
@@ -410,34 +425,33 @@ class AuthController extends Controller
     }
 
 
-    public function verifyOtp(Request $request){
+    public function verifyOtp(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'phone' => 'required',
             'otp' => 'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors'=>$validator->errors()], 422);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
-        $res='failed';
+        $res = 'failed';
         $user = User::where('phone', 'LIKE', "%$request->phone%")
             ->where('verificationToken', '=', $request->otp)
             ->first();
-        if( !empty($user)){
-            $res='success';
-            $mgs='OTP Verification Success';
-            $user->is_verified=1;
-            $user->status=1;
+        if (!empty($user)) {
+            $res = 'success';
+            $mgs = 'OTP Verification Success';
+            $user->is_verified = 1;
+            $user->status = 1;
             $user->save();
 
-            return response()->json(['status'=>$res,'user'=>['phone'=>$user->phone],'messages'=>$mgs]);
+            return response()->json(['status' => $res, 'user' => ['phone' => $user->phone], 'messages' => $mgs]);
         }
-        $mgs='Verification Failed! Please, try again with correct OTP sent to '.$request->phone;
-        return response()->json(['status'=>$res,'user'=>['phone'=>$request->phone],'messages'=>$mgs]);
-
+        $mgs = 'Verification Failed! Please, try again with correct OTP sent to ' . $request->phone;
+        return response()->json(['status' => $res, 'user' => ['phone' => $request->phone], 'messages' => $mgs]);
 
 
     }
-
 
 
 }
