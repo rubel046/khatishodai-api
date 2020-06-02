@@ -26,7 +26,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('account_type')->nullable()->unsigned();
             $table->integer('parent_id')->nullable()->unsigned();
             $table->string('userName',100)->unique()->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('first_name',100)->nullable();
             $table->string('last_name',100)->nullable();
             $table->string('photo',150)->nullable();
