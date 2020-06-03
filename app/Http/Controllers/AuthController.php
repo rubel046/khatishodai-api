@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
 use Laravel\Socialite\Facades\Socialite;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Validator;
 
 class AuthController extends Controller
@@ -219,16 +220,6 @@ class AuthController extends Controller
         }
 
         return $this->respondWithToken($token);
-    }
-
-    public function socialLogin($provider)
-    {
-        return Socialite::with($provider)->stateless()->redirect();
-    }
-
-    public function handleProviderCallback($provider)
-    {
-        return $user = Socialite::driver($provider)->user();
     }
 
     public function logout()
