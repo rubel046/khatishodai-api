@@ -1,17 +1,18 @@
 <?php
 
 namespace App\Model;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Country extends Model
+class AttributeTerm extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
-    //protected $fillable = ['name','code'];
-    public function division()
+
+
+    public function attribute()
     {
-        return $this->hasMany('App\Model\Division');
+        return $this->belongsTo('App\Attribute');
     }
 }
+

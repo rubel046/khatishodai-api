@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Attribute;
-use Illuminate\Http\Request;
+use App\Model\Division;
 use App\Repositories\Repository;
+use Illuminate\Http\Request;
 
-class AttributeController extends Controller
+class DivisionController extends Controller
 {
     private $model;
 
-    public function __construct(Attribute $attribute)
+    public function __construct(Division $division)
     {
         $this->middleware('auth');
-        $this->model = new Repository($attribute);
+        $this->model = new Repository($division);
     }
 
     public function index()
@@ -37,23 +37,24 @@ class AttributeController extends Controller
 
     public function search(Request $request)
     {
-        $this->validate($request, ['searchStr' => 'required|string']);
+        $this->validate($request,['searchStr'=>'required|string']);
         try {
             $searchItem = $request->searchStr;
-            $attributes = Attribute::query()
+            $data = Zone::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
+                ->orWhere('code', 'LIKE', "%{$searchItem}%")
                 ->get();
-            if (!$attributes->isEmpty()) {
-                return response()->json(['data' => $attributes, 'message' => 'Result with this query'], 200);
-            } else {
-                return response()->json(['data' => $attributes, 'message' => 'No data found!'], 404);
+                
+            if(!$data->isEmpty()){
+                return response()->json(['datas' => $data,'message' => 'Result  with this query'], 200);
+            }else{
+                return response()->json(['datas' => $data,'message' => 'No data found!'], 404);
             }
 
 
         } catch (\Exception $e) {
-            $errCode = $e->getCode();
-            $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
+
+            return response()->json(['message' => 'Error found!'], 500);
         }
 
     }
@@ -73,10 +74,9 @@ class AttributeController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:attributes,name' . ($id ? ', ' . $id : ''),
-            'slug' => 'string',
-            'type' => 'in:color,image,label',
-            'status' => 'numeric',
+            'country_id' => 'required|numeric',
+            'name' => 'required|string',
         ]);
     }
+
 }

@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Attribute;
+use App\Model\AttributeTerm;
 use Illuminate\Http\Request;
 use App\Repositories\Repository;
 
-class AttributeController extends Controller
+class AttributeTermsController extends Controller
 {
     private $model;
 
-    public function __construct(Attribute $attribute)
+    public function __construct(AttributeTerm $attributeTerms)
     {
         $this->middleware('auth');
-        $this->model = new Repository($attribute);
+        $this->model = new Repository($attributeTerms);
     }
 
     public function index()
@@ -53,7 +53,7 @@ class AttributeController extends Controller
         } catch (\Exception $e) {
             $errCode = $e->getCode();
             $errMgs = $e->getMessage();
-            return response()->json(['error code' => $errCode, 'message' => $errMgs], 500);
+            return response()->json(['error_code' => $errCode, 'message' => $errMgs], 500);
         }
 
     }
@@ -73,9 +73,8 @@ class AttributeController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'name' => 'required|string|unique:attributes,name' . ($id ? ', ' . $id : ''),
-            'slug' => 'string',
-            'type' => 'in:color,image,label',
+            'name' => 'required|string',
+            'attribute_id' => 'required|numeric',
             'status' => 'numeric',
         ]);
     }

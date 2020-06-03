@@ -74,10 +74,10 @@ class ZoneController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'country_id' => 'required|numeric',
+            'city_id' => 'required|numeric',
             'name' => 'required|string',
-            'code' => 'required|string|unique:zones,code' . ($id ? ', ' . $id : ''),
-            'status' => 'required|numeric',
+            'zip_code' => 'required|string',
+            'status' => 'numeric',
         ]);
     }
 
