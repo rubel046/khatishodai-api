@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class SocialAuthController
+class SocialAuthController extends Controller
 {
     public function socialLogin($provider)
     {
