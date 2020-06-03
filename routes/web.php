@@ -25,6 +25,8 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->post('register', 'AuthController@register');
     $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
+    $router->get('login/{provider}', 'AuthController@socialLogin');
+    $router->get('login/{provider}/callback', 'AuthController@handleProviderCallback');
     $router->post('forget-password', 'PasswordController@forgetPassword');
     $router->get('password-reset/{id}/{verify_token}', 'PasswordController@resetPassword');
     $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
