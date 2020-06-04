@@ -33,6 +33,8 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->post('logout', 'AuthController@logout');
     $router->get('profile', 'UserController@profile');
     $router->get('users/{id}', 'UserController@show');
+    $router->put('/{id}', 'UserController@update');
+    $router->get('company', 'UserController@company');
     $router->get('list', 'UserController@index');
     $router->post('verify-otp', 'AuthController@verifyOtp');
     $router->get('test-otp/{phone}', 'AuthController@testOtp');

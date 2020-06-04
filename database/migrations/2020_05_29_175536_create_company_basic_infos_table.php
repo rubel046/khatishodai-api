@@ -32,9 +32,9 @@ class CreateCompanyBasicInfosTable extends Migration
             $table->string('phone',50)->nullable();
             $table->string('cell',50)->nullable();
             $table->string('fax',50)->nullable();
-            $table->integer('number_of_employee');
-            $table->tinyInteger('ownership_type');
-            $table->integer('turnover_id');
+            $table->integer('number_of_employee')->nullable();
+            $table->tinyInteger('ownership_type')->nullable();
+            $table->integer('turnover_id')->nullable();
             $table->commonFields();
         });
     }

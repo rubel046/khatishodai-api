@@ -35,10 +35,11 @@ class CreateUsersTable extends Migration
             $table->string('phone',100)->unique()->nullable();
             $table->string('telephone',100)->nullable();
             $table->text('address')->nullable();
-            $table->string('district',100)->nullable();
-            $table->string('division',100)->nullable();
+            $table->string('city_id',100)->nullable();
+            $table->string('zone_id',100)->nullable();
+            $table->string('division_id',100)->nullable();
+            $table->string('district_id',100)->nullable();
             $table->integer('country_id')->nullable();
-            $table->string('zipcode',100)->nullable();
             $table->mediumText('verificationToken')->nullable();
             $table->tinyInteger('is_verified')->nullable()->unsigned();
             $table->tinyInteger('is_admin')->default(0)->unsigned();
