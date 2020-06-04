@@ -41,11 +41,15 @@ $router->group(['prefix' => 'account'], function () use ($router) {
 
 resource('btype', 'BusinessTypeController');
 resource('brand', 'BrandController');
-resource('product/attribute/group', 'AttributeGroupController');
 resource('product/attribute', 'AttributeController');
+resource('product/attribute_terms', 'AttributeTermsController');
+resource('product/attribute_groups', 'AttributeGroupController');
+resource('product/attribute_group_assigned_terms', 'AttrGroupAssignedTermsController');
 resource('company', 'CompanyController');
 resource('category', 'CategoryController');
 resource('country', 'CountryController');
+resource('division', 'DivisionController');
+resource('city', 'CityController');
 resource('zone', 'ZoneController');
 resource('menu_operations', 'MenuOperationController');
 resource('comp_certificates', 'CompanyCertificateController');

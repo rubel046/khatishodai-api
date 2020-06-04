@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
-class CreateGroupAssignedTermsTable extends Migration
+class CreateAttributeGroupAssignedTermsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -19,7 +19,7 @@ class CreateGroupAssignedTermsTable extends Migration
             return new CustomBlueprint($table, $callback);
         });
 
-        $schema->create('group_assigned_terms', function (CustomBlueprint $table) {
+        $schema->create('attribute_group_assigned_terms', function (CustomBlueprint $table) {
             $table->id();
             $table->integer('attribute_group_id')->unsigned()->index('attribute_group_id');
             $table->integer('attribute_id')->unsigned()->index('attribute_id');
@@ -37,6 +37,6 @@ class CreateGroupAssignedTermsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('group_assigned_terms');
+        Schema::dropIfExists('attribute_group_assigned_terms');
     }
 }

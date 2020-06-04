@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
-class CreateZonesTable extends Migration
+class CreateDivisionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,12 +18,11 @@ class CreateZonesTable extends Migration
         $schema->blueprintResolver(function ($table, $callback) {
             return new CustomBlueprint($table, $callback);
         });
-        
-        $schema->create('zones', function (CustomBlueprint $table) {
+
+        $schema->create('divisions', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('city_id')->nullable()->unsigned();
-            $table->string('name',100)->nullable();
-            $table->string('zip_code',100)->nullable();
+            $table->integer('country_id')->unsigned();
+            $table->string('name',100);
             $table->commonFields();
         });
     }
@@ -35,6 +34,6 @@ class CreateZonesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('zones');
+        Schema::dropIfExists('divisions');
     }
 }

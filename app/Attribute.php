@@ -9,12 +9,12 @@ class Attribute extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name', 'attribute_group_id','ip_address','status'
+        'name', 'slug','type','status', 'ip_address','created_by', 'updated_by'
     ];
 
     public function attributeGroup()
     {
-        return $this->belongsTo('App\AttributeGroup');
+        return $this->hasMany('App\Model\AttributeTerm');
     }
 }
 

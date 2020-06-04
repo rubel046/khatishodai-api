@@ -5,13 +5,12 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Country extends Model
+class Division extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
-    //protected $fillable = ['name','code'];
-    public function division()
+    public function city()
     {
-        return $this->hasMany('App\Model\Division');
+        return $this->hasMany('App\Model\City');
     }
 }
