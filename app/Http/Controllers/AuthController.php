@@ -11,6 +11,7 @@ use  App\User;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Validator;
+use App\Model\Company;
 
 class AuthController extends Controller
 {
@@ -78,6 +79,14 @@ class AuthController extends Controller
             $user->password = app('hash')->make($plainPassword);
             $user->is_verified = 0;
             $user->save();
+
+            // Insert Company Name
+            $companyData = new Company();
+            $companyData->user_id=$user->id;
+            $companyData->name=$request->input('companyName');
+            $companyData->ip_address=$request->ip();
+            $companyData->created_by=$user->id;
+            $companyData->save();
 
             $toName = $user->first_name . ' ' . $user->last_name;
 

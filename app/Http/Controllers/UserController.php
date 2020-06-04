@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
+use  App\Model\Company;
 use App\Repositories\Repository;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -52,6 +54,23 @@ class UserController extends Controller
         return $this->model->show($id);
 
     }
+    public function update(Request $request, $id)
+    {
+        $this->validation($request, $id);
+        $data = $request->all();
+        $data['photo'] = $this->uploadImage($request);
+
+        return $this->model->update($data, $id);
+    }
+
+    public function company()
+    {
+        $userId=auth()->id();
+        $companyInfo=Company::where('user_id', $userId)->first();
+        return response()->json(['result' => $companyInfo], 200);
+
+
+    }
 
     public function logout()
     {
@@ -75,6 +94,40 @@ class UserController extends Controller
         echo 'success!';
         //Mail::to('somebody@example.org')->send(new MyEmail());
     }
+
+    private function validation(Request $request, $id = false)
+    {
+        $this->validate($request, [
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'job_title' => 'required|string',
+            'email' => 'email|string',
+            'photo' => 'image|mimes:jpeg,png,jpg|max:512',
+            'address' => 'string',
+            'city_id' => 'numeric',
+            'zone_id' => 'numeric',
+            'division_id' => 'numeric',
+            'district_id' => 'numeric',
+            'country_id' => 'numeric',
+        ]);
+
+    }
+
+    private function uploadImage(Request $request)
+    {
+        if ($request->hasFile('photo')) {
+            $file_ext = $request->file('photo')->clientExtension();
+            $destination_path = base_path('public/upload/users');
+            $image = uniqid() . '-' . time() . '.' . $file_ext;
+
+            if ($request->file('photo')->move($destination_path, $image)) {
+                return '/upload/brands/' . $image;
+            }
+        }
+        return null;
+    }
+
+
 
 
 }
