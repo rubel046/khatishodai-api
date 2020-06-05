@@ -41,19 +41,19 @@ $router->group(['prefix' => 'account'], function () use ($router) {
 
 });
 
+resource('menu_operations', 'MenuOperationController');
 resource('btype', 'BusinessTypeController');
 resource('brand', 'BrandController');
+resource('category', 'CategoryController');
 resource('product/attribute', 'AttributeController');
 resource('product/attribute_terms', 'AttributeTermsController');
 resource('product/attribute_groups', 'AttributeGroupController');
 resource('product/attribute_group_assigned_terms', 'AttrGroupAssignedTermsController');
-resource('company', 'CompanyController');
-resource('category', 'CategoryController');
 resource('country', 'CountryController');
 resource('division', 'DivisionController');
 resource('city', 'CityController');
 resource('zone', 'ZoneController');
-resource('menu_operations', 'MenuOperationController');
+resource('company', 'CompanyController');
 resource('comp_certificates', 'CompanyCertificateController');
 resource('comp_details', 'CompanyDetailsController');
 resource('comp_factories', 'CompanyFactoriesController');
@@ -62,6 +62,9 @@ resource('comp_photos', 'CompanyPhotosController');
 resource('comp_products', 'CompanyProductsController');
 resource('comp_trade_infos', 'CompanyTradeInfosController');
 resource('comp_trade_memberships', 'CompanyTadeMembershipsController');
+$router->get('divisions/{country_id}', 'DivisionController@getDivision');
+$router->get('cities/{division_id}', 'CityController@geCity');
+$router->get('zones/{city_id}', 'ZoneController@geZone');
 
 
 // API route group mail

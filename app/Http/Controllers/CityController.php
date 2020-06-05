@@ -34,6 +34,11 @@ class CityController extends Controller
         return $this->model->show($id);
     }
 
+    public function geCity($division_id)
+    {
+        $data=City::where('division_id', $division_id)->first();
+        return response()->json(['result' => $data], 200);
+    }
 
     public function search(Request $request)
     {

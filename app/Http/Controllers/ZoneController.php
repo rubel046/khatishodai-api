@@ -34,21 +34,27 @@ class ZoneController extends Controller
         return $this->model->show($id);
     }
 
+    public function geZone($city_id)
+    {
+        $data = Zone::where('city_id', $city_id)->first();
+        return response()->json(['result' => $data], 200);
+    }
+
 
     public function search(Request $request)
     {
-        $this->validate($request,['searchStr'=>'required|string']);
+        $this->validate($request, ['searchStr' => 'required|string']);
         try {
             $searchItem = $request->searchStr;
             $data = Zone::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
                 ->orWhere('code', 'LIKE', "%{$searchItem}%")
                 ->get();
-                
-            if(!$data->isEmpty()){
-                return response()->json(['datas' => $data,'message' => 'Result  with this query'], 200);
-            }else{
-                return response()->json(['datas' => $data,'message' => 'No data found!'], 404);
+
+            if (!$data->isEmpty()) {
+                return response()->json(['datas' => $data, 'message' => 'Result  with this query'], 200);
+            } else {
+                return response()->json(['datas' => $data, 'message' => 'No data found!'], 404);
             }
 
 
