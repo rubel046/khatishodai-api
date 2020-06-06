@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\RegionFilter;
 use App\Model\City;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
@@ -10,10 +11,10 @@ class CityController extends Controller
 {
     private $model;
 
-    public function __construct(City $model)
+    public function __construct(City $model, RegionFilter $regionFilter)
     {
         $this->middleware('auth');
-        $this->model = new Repository($model);
+        $this->model = new Repository($model, $regionFilter);
     }
 
     public function index()
@@ -49,7 +50,7 @@ class CityController extends Controller
                 ->where('name', 'LIKE', "%{$searchItem}%")
                 ->orWhere('code', 'LIKE', "%{$searchItem}%")
                 ->get();
-                
+
             if(!$data->isEmpty()){
                 return response()->json(['datas' => $data,'message' => 'Result  with this query'], 200);
             }else{

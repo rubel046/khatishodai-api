@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\RegionFilter;
 use App\Model\Zone;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
@@ -10,10 +11,10 @@ class ZoneController extends Controller
 {
     private $model;
 
-    public function __construct(Zone $model)
+    public function __construct(Zone $model, RegionFilter $regionFilter)
     {
         $this->middleware('auth');
-        $this->model = new Repository($model);
+        $this->model = new Repository($model, $regionFilter);
     }
 
     public function index()
