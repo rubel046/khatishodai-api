@@ -125,7 +125,7 @@ class DataFilter extends QueryFilter
      */
     public function name($title)
     {
-        return $this->builder->where('title', 'like', '%' . $title . '%');
+        return $this->builder->where('name', 'like', '%' . $title . '%');
     }
 
     /**
@@ -135,7 +135,7 @@ class DataFilter extends QueryFilter
     public function withRelation($title)
     {
         return $this->builder->with([$title => function ($query) use ($title) {
-            $query->select($title . '.id', 'title');
+            $query->select($title . '.id', 'name');
         }]);
     }
 
