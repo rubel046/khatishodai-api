@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\RegionFilter;
 use App\Model\Division;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
@@ -10,10 +11,11 @@ class DivisionController extends Controller
 {
     private $model;
 
-    public function __construct(Division $division)
+    public function __construct(Division $division, RegionFilter $regionFilter)
     {
         $this->middleware('auth');
-        $this->model = new Repository($division);
+
+        $this->model = new Repository($division, $regionFilter);
     }
 
     public function index()
@@ -32,13 +34,6 @@ class DivisionController extends Controller
     public function show($id)
     {
         return $this->model->show($id);
-    }
-
-
-    public function getDivision($country_id)
-    {
-        $data = Division::where('country_id', $country_id)->first();
-        return response()->json(['result' => $data], 200);
     }
 
 

@@ -38,7 +38,6 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->get('list', 'UserController@index');
     $router->post('verify-otp', 'AuthController@verifyOtp');
     $router->get('test-otp/{phone}', 'AuthController@testOtp');
-
 });
 
 resource('menu_operations', 'MenuOperationController');
@@ -62,9 +61,6 @@ resource('comp_photos', 'CompanyPhotosController');
 resource('comp_products', 'CompanyProductsController');
 resource('comp_trade_infos', 'CompanyTradeInfosController');
 resource('comp_trade_memberships', 'CompanyTadeMembershipsController');
-$router->get('divisions/{country_id}', 'DivisionController@getDivision');
-$router->get('cities/{division_id}', 'CityController@geCity');
-$router->get('zones/{city_id}', 'ZoneController@geZone');
 
 
 // API route group mail
