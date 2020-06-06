@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
+use Illuminate\Support\Facades\DB;
 
 class AttributeGroupTableSeeder extends Seeder
 {
@@ -11,6 +13,17 @@ class AttributeGroupTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        $faker = Faker::create();
+        foreach (range(1, 100) as $index) {
+            DB::table('attribute_groups')->insert([
+                'name' => $faker->text(20),
+                'status' => $faker->boolean(),
+                'created_by' => $faker->numberBetween(1,20),
+                'updated_by' => $faker->numberBetween(1,20),
+                'created_at' => $faker->dateTime,
+                'updated_at' => $faker->dateTime,
+                'ip_address' => $faker->ipv4,
+            ]);
+        }
     }
 }
