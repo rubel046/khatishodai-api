@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use App\Http\Helper\CustomBlueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
 
 class CreateUsersTable extends Migration
 {
@@ -46,6 +47,11 @@ class CreateUsersTable extends Migration
 
             $table->commonFields();
         });
+
+         //now the data migration
+        Artisan::call('db:seed', [
+            '--class' => UserSeeder::class
+        ]);
     }
 
     /**
