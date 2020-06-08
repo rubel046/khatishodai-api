@@ -61,7 +61,7 @@ resource('comp_photos', 'CompanyPhotosController');
 resource('comp_products', 'CompanyProductsController');
 resource('comp_trade_infos', 'CompanyTradeInfosController');
 resource('comp_trade_memberships', 'CompanyTadeMembershipsController');
-
+$router->get('config', 'ConfigController@index');
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {

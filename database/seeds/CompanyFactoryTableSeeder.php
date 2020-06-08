@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
+use Illuminate\Support\Facades\DB;
+use App\Model\Company;
 
 class CompanyFactoryTableSeeder extends Seeder
 {
@@ -11,6 +14,23 @@ class CompanyFactoryTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        $faker = Faker::create();
+        foreach (range(1, 100) as $index) {
+            DB::table('company_factories')->insert([
+                'company_id' => Company::all()->random()->id,
+                'location' => $faker->address,
+                'size_id' => $faker->numberBetween(1, 20),
+                'staff_number_id' => $faker->numberBetween(1, 20),
+                'rnd_staff_id' => $faker->numberBetween(1, 20),
+                'production_line_id' => $faker->numberBetween(1, 20),
+                'annual_output_id' => $faker->numberBetween(1, 20),
+                'status' => $faker->boolean,
+                'created_by' => $faker->numberBetween(1, 20),
+                'updated_by' => $faker->numberBetween(1, 20),
+                'created_at' => $faker->dateTime,
+                'updated_at' => $faker->dateTime,
+                'ip_address' => $faker->ipv4,
+            ]);
+        }
     }
 }

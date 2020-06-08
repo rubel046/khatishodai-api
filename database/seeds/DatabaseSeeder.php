@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call('UsersTableSeeder');
+        $this->call('AccountTypeSeeder');
         $this->call('BusinessTypeTableSeeder');
         $this->call('CountryTableSeeder');
         $this->call('DivisionTableSeeder');
@@ -23,5 +24,15 @@ class DatabaseSeeder extends Seeder
         $this->call('AttributeTermsTableSeeder');
         $this->call('AttributeGroupTableSeeder');
         $this->call('AttributeGroupAssignedTermTableSeeder');
+        $this->call('CompanyTableSeeder');
+        $this->call('CompanyTradeInfoTableSeeder');
+        $this->call('CompanyProductTableSeeder');
+        $this->call('CompanyCertificateTableSeeder');
+        $this->call('CompanyDetailTableSeeder');
+        $this->call('CompanyFactoryTableSeeder');
+        $this->call('CompanyNearestPortTableSeeder');
+        $this->call('CompanyPhotoTableSeeder');
+        $this->call('CompanyTradeMembershipTableSeeder');
+        $this->call('WebUserSeeder');
     }
 }
