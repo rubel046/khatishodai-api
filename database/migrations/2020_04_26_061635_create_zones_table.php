@@ -21,9 +21,9 @@ class CreateZonesTable extends Migration
         
         $schema->create('zones', function (CustomBlueprint $table) {
             $table->id();
-            $table->integer('country_id')->nullable()->unsigned();
+            $table->integer('city_id')->nullable()->unsigned();
             $table->string('name',100)->nullable();
-            $table->string('code',100)->nullable();
+            $table->string('zip_code',100)->nullable();
             $table->commonFields();
         });
     }

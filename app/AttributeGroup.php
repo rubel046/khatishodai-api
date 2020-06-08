@@ -11,10 +11,9 @@ class AttributeGroup extends Model
     protected $guarded = [];
 
 
-    public function attribute()
+    public function group_assigned_term()
     {
-        return $this->hasMany('App\Attribute');
-       // return $this->hasMany(Attribute::class);
+        return $this->hasMany('App\Model\GroupAssignedTerm');
     }
 
 }

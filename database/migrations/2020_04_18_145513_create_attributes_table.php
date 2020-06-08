@@ -22,7 +22,8 @@ class CreateAttributesTable extends Migration
         $schema->create('attributes', function (CustomBlueprint $table) {
             $table->id();
             $table->string('name',100);
-            $table->integer('attribute_group_id')->comment = 'Foreign key mapped with attribute group';
+            $table->string('slug',100)->nullable();
+            $table->enum('type',['color','image','label'])->nullable();
             $table->commonFields();
         });
     }

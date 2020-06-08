@@ -60,6 +60,7 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('services');
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +98,7 @@ $app->routeMiddleware([
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(\SocialiteProviders\Manager\ServiceProvider::class);
 // Add this line
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register('Nord\Lumen\Cors\CorsServiceProvider');

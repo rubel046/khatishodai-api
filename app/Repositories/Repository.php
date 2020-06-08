@@ -4,6 +4,7 @@
 namespace App\Repositories;
 
 
+use App\Filters\DataFilter;
 use App\Traits\ApiResponse;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,36 +14,40 @@ class Repository implements RepositoryInterface
 
     // model property on class instances
     protected $model;
+    protected $filter;
 
     // Constructor to bind model to repo
-    public function __construct(Model $model)
+    public function __construct(Model $model, DataFilter $dataFilter = null)
     {
         $this->model = $model;
+        $this->filter = $dataFilter;
     }
 
     // Get all instances of model
     public function all()
     {
         try {
-            return $this->showAll($this->model->all());
+            return $this->showAll($this->filter()->get());
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
     }
 
     // Get paginate list of model
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function paginate()
     {
         try {
-            $resutl = $this->model->paginate(PER_PAGE);
-
+            $result = $this->filter()->paginate(PER_PAGE);
             $meta = [
-                'per_page' => $resutl->perPage(),
-                'total_page' => $resutl->lastPage(),
-                'total_item' => $resutl->total(),
-                'current_page' => $resutl->currentPage()
+                'per_page' => $result->perPage(),
+                'total_page' => $result->lastPage(),
+                'total_item' => $result->total(),
+                'current_page' => $result->currentPage()
             ];
-            return $this->pagination(['result' => $resutl->items(), 'meta' => $meta]);
+            return $this->pagination(['result' => $result->items(), 'meta' => $meta]);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
@@ -103,8 +108,7 @@ class Repository implements RepositoryInterface
     }
 
     // Set the associated model
-    public
-    function setModel($model)
+    public function setModel($model)
     {
         $this->model = $model;
         return $this;
@@ -114,5 +118,14 @@ class Repository implements RepositoryInterface
     public function with($relations)
     {
         return $this->model->with($relations);
+    }
+
+    //apply filter
+    private function filter()
+    {
+        if ($this->filter)
+            return $this->model->filter($this->filter);
+
+        return $this->model;
     }
 }

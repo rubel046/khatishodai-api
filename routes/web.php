@@ -25,27 +25,34 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->post('register', 'AuthController@register');
     $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
+    $router->get('login/{provider:facebook|google}', 'SocialAuthController@socialLogin');
+    $router->get('login/{provider:facebook|google}/callback', 'SocialAuthController@handleProviderCallback');
     $router->post('forget-password', 'PasswordController@forgetPassword');
     $router->get('password-reset/{id}/{verify_token}', 'PasswordController@resetPassword');
     $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
     $router->post('logout', 'AuthController@logout');
     $router->get('profile', 'UserController@profile');
     $router->get('users/{id}', 'UserController@show');
+    $router->put('/{id}', 'UserController@update');
+    $router->get('company', 'UserController@company');
     $router->get('list', 'UserController@index');
     $router->post('verify-otp', 'AuthController@verifyOtp');
     $router->get('test-otp/{phone}', 'AuthController@testOtp');
-
 });
 
+resource('menu_operations', 'MenuOperationController');
 resource('btype', 'BusinessTypeController');
 resource('brand', 'BrandController');
-resource('product/attribute/group', 'AttributeGroupController');
-resource('product/attribute', 'AttributeController');
-resource('company', 'CompanyController');
 resource('category', 'CategoryController');
+resource('product/attribute', 'AttributeController');
+resource('product/attribute_terms', 'AttributeTermsController');
+resource('product/attribute_groups', 'AttributeGroupController');
+resource('product/attribute_group_assigned_terms', 'AttrGroupAssignedTermsController');
 resource('country', 'CountryController');
+resource('division', 'DivisionController');
+resource('city', 'CityController');
 resource('zone', 'ZoneController');
-resource('menu_operations', 'MenuOperationController');
+resource('company', 'CompanyController');
 resource('comp_certificates', 'CompanyCertificateController');
 resource('comp_details', 'CompanyDetailsController');
 resource('comp_factories', 'CompanyFactoriesController');
@@ -54,7 +61,7 @@ resource('comp_photos', 'CompanyPhotosController');
 resource('comp_products', 'CompanyProductsController');
 resource('comp_trade_infos', 'CompanyTradeInfosController');
 resource('comp_trade_memberships', 'CompanyTadeMembershipsController');
-
+$router->get('config', 'ConfigController@index');
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {

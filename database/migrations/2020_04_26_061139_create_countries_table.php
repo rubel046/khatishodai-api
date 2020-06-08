@@ -25,7 +25,7 @@ class CreateCountriesTable extends Migration
             $table->string('code_a3',100)->nullable();
             $table->string('code_n3',200)->nullable();
             $table->text('lat')->nullable();
-            $table->tinyInteger('lot')->nullable();
+            $table->text('long')->nullable();
             $table->commonFields();
         });
     }

@@ -74,7 +74,9 @@ class AttributeController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|unique:attributes,name' . ($id ? ', ' . $id : ''),
-            'attribute_group_id' => 'required|numeric',
+            'slug' => 'string',
+            'type' => 'in:color,image,label',
+            'status' => 'numeric',
         ]);
     }
 }
