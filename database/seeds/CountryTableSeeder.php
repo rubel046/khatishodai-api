@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
+use App\Model;
 
 
 class CountryTableSeeder extends Seeder
@@ -13,22 +13,20 @@ class CountryTableSeeder extends Seeder
      * @return void
      */
     public function run() {
-        $faker = Faker::create();
-        foreach (range(1, 100) as $index) {
-            DB::table('countries')->insert([
-                'name' => $faker->country,
-                'code' => $faker->countryCode,
-                'code_a3' => $faker->countryCode,
-                'code_n3' => $faker->countryCode,
-                'lat' => $faker->postcode(10),
-                'long' => $faker->postcode(15),
-                'status' => $faker->randomElement([1,2,3]),
-                'created_by' => $faker->randomElement([1,2,3]),
-                'updated_by' => $faker->randomElement([1,2,3]),
-                'created_at' => $faker->dateTime,
-                'updated_at' => $faker->dateTime,
-                'ip_address' => $faker->ipv4,
-            ]);
-        }
+        Schema::disableForeignKeyConstraints();
+        DB::table("countries")->truncate();
+        $clinet = new \GuzzleHttp\Client();
+        $result = $clinet->request('GET', 'https://restcountries.eu/rest/v2/all');
+        $result = json_decode($result->getBody()->getContents());
+        collect($result)->map(function ($country){
+            $latlng= $country->latlng;
+            $cn = new Model\Country();
+            $cn->name = $country->name;
+            $cn->code = $country->alpha2Code;
+            $cn->lat = array_key_exists(0,$latlng)?$latlng[0]:null;
+            $cn->long = array_key_exists(1,$latlng)?$latlng[1]:null;
+            $cn->status = 1;
+            $cn->save();
+        });
     }
 }

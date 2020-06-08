@@ -19,11 +19,12 @@ class UserSeeder extends Seeder
             'userName' => 'admin@gmail.com',
             'email' => 'admin@gmail.com',
             'phone' => '880123456789',
-            'password' => Hash::make('tizaara!@#4'),
+            'password' => Hash::make('123456'),
             'account_type' => '1',
             'status' => '1',
             'is_admin' => '1',
             'is_verified' => '1',
         ]);
+
     }
 }

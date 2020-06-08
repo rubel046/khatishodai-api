@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
 
-class BusinessTypeTableSeeder extends Seeder
+class AccountTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,10 +14,12 @@ class BusinessTypeTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        $typeArray=['Wholesaler','Retailer','Manufacturer','Supplier','Exporter','Distributor','Importer','Service Provider','Buying House','Trader','Wholesaler','Retailer'];
+        $typeArray=['Supplier','Buyer','Both Supplier and Buyer','Super Admin', 'Admin','Service Provider','Sales Assistant','Product Manager'];
         foreach ($typeArray as $val) {
-            DB::table('business_types')->insert([
+            DB::table('account_types')->insert([
                 'name' => $val,
+                'description' => $faker->text(50),
+                'is_admin' => $faker->boolean(),
                 'status' => $faker->boolean(),
                 'created_by' => $faker->randomElement([1,2,3]),
                 'updated_by' => $faker->randomElement([1,2,3]),
