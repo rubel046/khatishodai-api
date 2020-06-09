@@ -16,4 +16,9 @@ class CompanyFactory extends Model
     {
         return $this->belongsTo('App\Model\Company', 'company_id');
     }
+
+    public function rnd_staff()
+    {
+        return $this->belongsTo('App\Model\RndStaffBreakdown');
+    }
 }
