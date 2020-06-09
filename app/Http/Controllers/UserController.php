@@ -105,7 +105,7 @@ class UserController extends Controller
             'photo' => 'image|mimes:jpeg,png,jpg|max:512',
             'address' => 'string',
             'city_id' => 'numeric',
-            'zone_id' => 'numeric',
+            'area_id' => 'numeric',
             'division_id' => 'numeric',
             'district_id' => 'numeric',
             'country_id' => 'numeric',

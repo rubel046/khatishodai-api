@@ -36,9 +36,9 @@ class RegionFilter extends DataFilter
      * @param $id
      * @return mixed
      */
-    public function zone_id($id)
+    public function area_id($id)
     {
-        return $this->builder->where('zone_id', $id);
+        return $this->builder->where('area_id', $id);
     }
 
 }
