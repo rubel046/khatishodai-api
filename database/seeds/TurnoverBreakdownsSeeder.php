@@ -1,11 +1,10 @@
 <?php
 
-use App\Model\City;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
 
-class ZoneTableSeeder extends Seeder
+class TurnoverBreakdownsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,13 +14,11 @@ class ZoneTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        DB::table("zones")->truncate();
-        foreach (range(1, 500) as $index) {
-            DB::table('zones')->insert([
-                'city_id' => City::all()->random()->id,
-                'name' => $faker->city,
-                'zip_code' => $faker->postcode,
-                'status' => $faker->randomElement([1,2,3]),
+        // DB::table("turnover_breakdowns")->truncate();
+        foreach (range(1, 100) as $index) {
+            DB::table('turnover_breakdowns')->insert([
+                'name' => $faker->text(15),
+                'status' => $faker->boolean,
                 'created_by' => $faker->randomElement([1,2,3]),
                 'updated_by' => $faker->randomElement([1,2,3]),
                 'created_at' => $faker->dateTime,
