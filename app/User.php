@@ -58,4 +58,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->belongsTo('App\Model\User_Privileges');
     }
 
+    public function address()
+    {
+        return $this->morphOne('App\Model\Address', 'addressable');
+    }
+
 }
