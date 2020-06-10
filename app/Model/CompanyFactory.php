@@ -2,13 +2,8 @@
 
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 class CompanyFactory extends Model
 {
-    //
-    use SoftDeletes;
     protected $table = 'company_factories';
     protected $guarded = [];
 

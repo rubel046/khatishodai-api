@@ -2,12 +2,8 @@
 
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 class User_Privileges extends Model
 {
-    use SoftDeletes;
     protected $guarded = [];
     public function operations()
     {
