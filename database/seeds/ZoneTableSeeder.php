@@ -15,9 +15,9 @@ class ZoneTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        DB::table("zones")->truncate();
+        DB::table("areas")->truncate();
         foreach (range(1, 500) as $index) {
-            DB::table('zones')->insert([
+            DB::table('areas')->insert([
                 'city_id' => City::all()->random()->id,
                 'name' => $faker->city,
                 'zip_code' => $faker->postcode,

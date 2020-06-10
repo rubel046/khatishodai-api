@@ -37,30 +37,6 @@ class DivisionController extends Controller
     }
 
 
-    public function search(Request $request)
-    {
-        $this->validate($request, ['searchStr' => 'required|string']);
-        try {
-            $searchItem = $request->searchStr;
-            $data = Zone::query()
-                ->where('name', 'LIKE', "%{$searchItem}%")
-                ->orWhere('code', 'LIKE', "%{$searchItem}%")
-                ->get();
-
-            if (!$data->isEmpty()) {
-                return response()->json(['datas' => $data, 'message' => 'Result  with this query'], 200);
-            } else {
-                return response()->json(['datas' => $data, 'message' => 'No data found!'], 404);
-            }
-
-
-        } catch (\Exception $e) {
-
-            return response()->json(['message' => 'Error found!'], 500);
-        }
-
-    }
-
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);

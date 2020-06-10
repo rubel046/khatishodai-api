@@ -7,7 +7,7 @@ use App\Model\Area;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
 
-class ZoneController extends Controller
+class AreaController extends Controller
 {
     private $model;
 
