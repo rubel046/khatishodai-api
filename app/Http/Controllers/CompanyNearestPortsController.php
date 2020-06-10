@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\CompanyFilter;
 use App\Model\CompanyNearestPort;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
@@ -10,15 +11,15 @@ class CompanyNearestPortsController extends Controller
 {
     private $model;
 
-    public function __construct(CompanyNearestPort $model)
+    public function __construct(CompanyNearestPort $model, CompanyFilter $companyFilter)
     {
         $this->middleware('auth');
-        $this->model = new Repository($model);
+        $this->model = new Repository($model, $companyFilter);
     }
 
     public function index()
     {
-        return $this->model->paginate();
+        return $this->model->all();
     }
 
 

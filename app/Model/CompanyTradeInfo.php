@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
-
 class CompanyTradeInfo extends Model
 {
     protected $guarded = [];

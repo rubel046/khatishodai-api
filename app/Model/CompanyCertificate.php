@@ -2,13 +2,8 @@
 
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 class CompanyCertificate extends Model
 {
-    //
-    use SoftDeletes;
     protected $guarded = [];
 
     public function company()
