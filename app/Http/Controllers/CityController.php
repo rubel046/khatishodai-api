@@ -19,7 +19,7 @@ class CityController extends Controller
 
     public function index()
     {
-        return $this->model->paginate();
+        return $this->model->all();
     }
 
 

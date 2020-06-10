@@ -18,10 +18,6 @@ $router->get('/', function () use ($router) {
 
 // API route group account
 $router->group(['prefix' => 'account'], function () use ($router) {
-    // Matches "/account
-    $router->get('test', function () {
-        echo 'hi.... api';
-    });
     $router->post('register', 'AuthController@register');
     $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
