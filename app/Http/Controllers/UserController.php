@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
+use  App\Model\Address;
 use  App\Model\Company;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
@@ -58,7 +59,9 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
-        $data = $request->all();
+        $address =$request->address;
+        if (!empty($address)) auth()->user()->address()->updateOrCreate(['addressable_id' => auth()->id(), 'addressable_type' => User::class], $address);
+        $data = $request->except('address');
         $data['photo'] = $this->uploadImage($request);
 
         return $this->model->update($data, $id);
@@ -104,12 +107,7 @@ class UserController extends Controller
             'job_title' => 'required|string',
             'email' => 'email|string',
             'photo' => 'image|mimes:jpeg,png,jpg|max:512',
-            'address' => 'string',
-            'city_id' => 'numeric',
-            'area_id' => 'numeric',
-            'division_id' => 'numeric',
-            'district_id' => 'numeric',
-            'country_id' => 'numeric',
+            'address' => 'array',
         ]);
 
     }

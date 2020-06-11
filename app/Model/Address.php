@@ -6,6 +6,7 @@ namespace App\Model;
 class Address extends Model
 {
     protected $hidden = ['addressable_type', 'addressable_id', 'created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'];
+    protected $fillable = ['address', 'area_id', 'city_id', 'division_id', 'district_id','country_id', 'created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'];
 
 
     public function addressable()
