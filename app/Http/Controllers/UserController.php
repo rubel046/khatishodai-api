@@ -59,12 +59,14 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
-        $address =$request->address;
+        $address = $request->address;
         if (!empty($address)) auth()->user()->address()->updateOrCreate(['addressable_id' => auth()->id(), 'addressable_type' => User::class], $address);
         $data = $request->except('address');
         $data['photo'] = $this->uploadImage($request);
 
-        return $this->model->update($data, $id);
+        $this->model->update($data, $id);
+        return redirect()->to('account/profile');
+
     }
 
     public function company()
@@ -120,7 +122,7 @@ class UserController extends Controller
             $image = uniqid() . '-' . time() . '.' . $file_ext;
 
             if ($request->file('photo')->move($destination_path, $image)) {
-                return '/upload/brands/' . $image;
+                return '/upload/users/' . $image;
             }
         }
         return null;
