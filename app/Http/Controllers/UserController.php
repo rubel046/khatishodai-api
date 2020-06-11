@@ -31,7 +31,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return response()->json(['user' => auth()->user()->load('address')], 200);
+        return response()->json(['user' => auth()->user()->load('address')->load('company')], 200);
     }
 
     /**

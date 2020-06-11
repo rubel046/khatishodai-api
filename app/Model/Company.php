@@ -6,6 +6,7 @@ class Company extends Model
 {
     protected $table = 'company_basic_infos';
     protected $guarded = [];
+    protected $hidden = ['created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'];
 
 
     public function company_certificate()
@@ -56,5 +57,10 @@ class Company extends Model
     public function registerAddress()
     {
         return $this->morphOne('App\Model\Address', 'addressable')->where('address_type', 'register');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Model\User');
     }
 }
