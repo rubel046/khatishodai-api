@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\CompanyFilter;
 use App\Model\CompanyCertificate;
 use Illuminate\Http\Request;
 use App\Repositories\Repository;
@@ -10,15 +11,15 @@ class CompanyCertificateController extends Controller
 {
     private $model;
 
-    public function __construct(CompanyCertificate $companyCertificate)
+    public function __construct(CompanyCertificate $companyCertificate, CompanyFilter $companyFilter)
     {
         $this->middleware('auth');
-        $this->model = new Repository($companyCertificate);
+        $this->model = new Repository($companyCertificate, $companyFilter);
     }
 
     public function index()
     {
-        return $this->model->paginate();
+        return $this->model->all();
     }
 
 
@@ -41,18 +42,18 @@ class CompanyCertificateController extends Controller
 
     public function search(Request $request)
     {
-        $this->validate($request,['searchStr'=>'required|string']);
+        $this->validate($request, ['searchStr' => 'required|string']);
         try {
             $searchItem = $request->searchStr;
             $data = CompanyCertificate::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
                 ->orWhere('reference_number', 'LIKE', "%{$searchItem}%")
                 ->get();
-                
-            if(!$data->isEmpty()){
-                return response()->json(['datas' => $data,'message' => DATA_FOUND], 200);
-            }else{
-                return response()->json(['datas' => $data,'message' => NO_DATA], 404);
+
+            if (!$data->isEmpty()) {
+                return response()->json(['datas' => $data, 'message' => DATA_FOUND], 200);
+            } else {
+                return response()->json(['datas' => $data, 'message' => NO_DATA], 404);
             }
 
 
@@ -89,7 +90,7 @@ class CompanyCertificateController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'certificate_photo_name' => 'required|image|mimes:jpeg,png,jpg|max:512',
-            'status' =>  'required|numeric',
+            'status' => 'required|numeric',
         ]);
     }
 

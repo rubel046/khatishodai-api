@@ -30,7 +30,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password','created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'
     ];
 
     /**
@@ -56,6 +56,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function user_privileges()
     {
         return $this->belongsTo('App\Model\User_Privileges');
+    }
+
+    public function company()
+    {
+        return $this->hasOne('App\Model\Company');
+    }
+
+    public function address()
+    {
+        return $this->morphOne('App\Model\Address', 'addressable');
     }
 
 }

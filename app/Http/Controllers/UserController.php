@@ -31,7 +31,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return response()->json(['user' => Auth::user()], 200);
+        return response()->json(['user' => auth()->user()->load('address')->load('company')], 200);
     }
 
     /**
@@ -54,6 +54,7 @@ class UserController extends Controller
         return $this->model->show($id);
 
     }
+
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
@@ -65,8 +66,8 @@ class UserController extends Controller
 
     public function company()
     {
-        $userId=auth()->id();
-        $companyInfo=Company::where('user_id', $userId)->first();
+        $userId = auth()->id();
+        $companyInfo = Company::with('operationalAddress', 'registerAddress')->where('user_id', $userId)->first();
         return response()->json(['result' => $companyInfo], 200);
 
 
@@ -105,7 +106,7 @@ class UserController extends Controller
             'photo' => 'image|mimes:jpeg,png,jpg|max:512',
             'address' => 'string',
             'city_id' => 'numeric',
-            'zone_id' => 'numeric',
+            'area_id' => 'numeric',
             'division_id' => 'numeric',
             'district_id' => 'numeric',
             'country_id' => 'numeric',
@@ -126,8 +127,6 @@ class UserController extends Controller
         }
         return null;
     }
-
-
 
 
 }

@@ -7,7 +7,7 @@ use App\Model\Area;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
 
-class ZoneController extends Controller
+class AreaController extends Controller
 {
     private $model;
 
@@ -19,7 +19,7 @@ class ZoneController extends Controller
 
     public function index()
     {
-        return $this->model->paginate();
+        return $this->model->all();
     }
 
 

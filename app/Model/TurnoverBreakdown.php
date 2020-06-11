@@ -2,12 +2,12 @@
 
 namespace App\Model;
 
-class CompanyDetail extends Model
+class TurnoverBreakdown extends Model
 {
     protected $guarded = [];
 
     public function company()
     {
-        return $this->belongsTo('App\Model\Company', 'company_id');
+        return $this->hasMany('App\Model\Company');
     }
 }

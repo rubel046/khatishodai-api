@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Filters\RegionFilter;
-use App\Model\Area;
+use App\Model\RndStaffBreakdown;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
 
-class ZoneController extends Controller
+class RndStaffBreakdownController extends Controller
 {
     private $model;
 
-    public function __construct(Area $model, RegionFilter $regionFilter)
+    public function __construct(RndStaffBreakdown $model)
     {
         $this->middleware('auth');
-        $this->model = new Repository($model, $regionFilter);
+        $this->model = new Repository($model);
     }
 
     public function index()
@@ -30,10 +29,12 @@ class ZoneController extends Controller
     }
 
 
+
     public function show($id)
     {
         return $this->model->show($id);
     }
+
 
     public function update(Request $request, $id)
     {
@@ -50,9 +51,7 @@ class ZoneController extends Controller
     private function validation(Request $request, $id = false)
     {
         $this->validate($request, [
-            'city_id' => 'required|numeric',
             'name' => 'required|string',
-            'zip_code' => 'required|string',
             'status' => 'numeric',
         ]);
     }

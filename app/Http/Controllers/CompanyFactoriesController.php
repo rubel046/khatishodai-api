@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\CompanyFilter;
 use App\Model\CompanyFactory;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
@@ -10,15 +11,15 @@ class CompanyFactoriesController extends Controller
 {
     private $model;
 
-    public function __construct(CompanyFactory $model)
+    public function __construct(CompanyFactory $model, CompanyFilter $companyFilter)
     {
         $this->middleware('auth');
-        $this->model = new Repository($model);
+        $this->model = new Repository($model, $companyFilter);
     }
 
     public function index()
     {
-       return $this->model->paginate();
+        return $this->model->all();
     }
 
 
@@ -31,13 +32,13 @@ class CompanyFactoriesController extends Controller
 
     public function show($id)
     {
-       return $this->model->show($id);
+        return $this->model->show($id);
     }
 
 
     public function search(Request $request)
     {
-        $this->validate($request,['searchStr'=>'required|string']);
+        $this->validate($request, ['searchStr' => 'required|string']);
         try {
             $searchItem = $request->searchStr;
             $data = CompanyFactory::query()
@@ -45,10 +46,10 @@ class CompanyFactoriesController extends Controller
                 ->orWhere('location', 'LIKE', "%{$searchItem}%")
                 ->get();
 
-            if(!$data->isEmpty()){
-                return response()->json(['datas' => $data,'message' => DATA_FOUND], 200);
-            }else{
-                return response()->json(['datas' => $data,'message' => NO_DATA], 404);
+            if (!$data->isEmpty()) {
+                return response()->json(['datas' => $data, 'message' => DATA_FOUND], 200);
+            } else {
+                return response()->json(['datas' => $data, 'message' => NO_DATA], 404);
             }
 
 

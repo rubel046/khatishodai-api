@@ -18,10 +18,6 @@ $router->get('/', function () use ($router) {
 
 // API route group account
 $router->group(['prefix' => 'account'], function () use ($router) {
-    // Matches "/account
-    $router->get('test', function () {
-        echo 'hi.... api';
-    });
     $router->post('register', 'AuthController@register');
     $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
@@ -40,6 +36,7 @@ $router->group(['prefix' => 'account'], function () use ($router) {
     $router->get('test-otp/{phone}', 'AuthController@testOtp');
 });
 
+$router->get('config', 'ConfigController@index');
 resource('menu_operations', 'MenuOperationController');
 resource('btype', 'BusinessTypeController');
 resource('brand', 'BrandController');
@@ -51,7 +48,7 @@ resource('product/attribute_group_assigned_terms', 'AttrGroupAssignedTermsContro
 resource('country', 'CountryController');
 resource('division', 'DivisionController');
 resource('city', 'CityController');
-resource('zone', 'ZoneController');
+resource('area', 'AreaController');
 resource('company', 'CompanyController');
 resource('comp_certificates', 'CompanyCertificateController');
 resource('comp_details', 'CompanyDetailsController');
@@ -61,7 +58,11 @@ resource('comp_photos', 'CompanyPhotosController');
 resource('comp_products', 'CompanyProductsController');
 resource('comp_trade_infos', 'CompanyTradeInfosController');
 resource('comp_trade_memberships', 'CompanyTadeMembershipsController');
-$router->get('config', 'ConfigController@index');
+resource('turnover_breakdowns', 'TurnoverBreakdownController');
+resource('qc_staff_breakdowns', 'QcStaffBreakdownController');
+resource('rnd_staff_breakdowns', 'RndStaffBreakdownController');
+resource('revenue_breakdowns', 'RevenueBreakdownController');
+resource('export_percentage_breakdowns', 'ExportPercentageBreakdownController');
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {
