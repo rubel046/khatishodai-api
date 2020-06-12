@@ -84,7 +84,6 @@ class CompanyPhotosController extends Controller
         $this->validate($request, [
             'company_id' => 'required|numeric',
             'photo' => 'sometimes|image|mimes:jpeg,png,jpg|max:512',
-            'status' =>  'required|numeric',
         ]);
     }
     private function uploadImage(Request $request)

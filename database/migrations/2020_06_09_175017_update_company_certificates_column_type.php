@@ -27,8 +27,8 @@ class UpdateCompanyCertificatesColumnType extends Migration
     public function down()
     {
         Schema::table('company_certificates', function (Blueprint $table) {
-            $table->timestamp('start_date')->change();
-            $table->timestamp('end_date')->change();
+           /* $table->timestamp('start_date')->change();
+            $table->timestamp('end_date')->change();*/
         });
     }
 }

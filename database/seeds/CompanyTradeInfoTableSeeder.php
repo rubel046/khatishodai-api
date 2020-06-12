@@ -20,6 +20,7 @@ class CompanyTradeInfoTableSeeder extends Seeder
                 'company_id' => Company::all()->random()->id,
                 'annual_revenue_id' => $faker->numberBetween(1,20),
                 'export_percent_id' => $faker->numberBetween(1,20),
+                'export_started_year' => $faker->year,
                 'status' => $faker->boolean(),
                 'created_by' => $faker->numberBetween(1,20),
                 'updated_by' => $faker->numberBetween(1,20),
