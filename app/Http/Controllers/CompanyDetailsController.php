@@ -90,7 +90,6 @@ class CompanyDetailsController extends Controller
             'vision' => 'required|string',
             'youtube_link' => 'required|string',
             'fb_link' => 'required|string',
-            'status' =>  'required|numeric',
         ]);
     }
 
