@@ -52,18 +52,6 @@ class CompanyController extends Controller
 
     }
 
-    public function companyDetails(Request $request, Company $company)
-    {
-        $this->validation($request);
-        try {
-
-            return 0;
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
-        }
-
-    }
-
 
     public function show($id)
     {

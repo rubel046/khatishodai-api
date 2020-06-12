@@ -54,7 +54,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         if ($e instanceof ValidationException) {
-            return $this->errorResponse($e->validator->errors()->getMessages(), 400);
+            return $this->errorResponse($e->validator->errors()->getMessages(), 422);
         }
 
         if ($e instanceof AuthorizationException) {

@@ -49,6 +49,7 @@ resource('country', 'CountryController');
 resource('division', 'DivisionController');
 resource('city', 'CityController');
 resource('area', 'AreaController');
+$router->post('company/company_details', 'CompanyDetailsController@companyDetailsCreateOrUpdate');
 resource('company', 'CompanyController');
 resource('comp_certificates', 'CompanyCertificateController');
 resource('comp_details', 'CompanyDetailsController');
@@ -63,7 +64,6 @@ resource('qc_staff_breakdowns', 'QcStaffBreakdownController');
 resource('rnd_staff_breakdowns', 'RndStaffBreakdownController');
 resource('revenue_breakdowns', 'RevenueBreakdownController');
 resource('export_percentage_breakdowns', 'ExportPercentageBreakdownController');
-$router->post('company/company_details/{company_id}', 'CompanyController@companyDtls');
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {

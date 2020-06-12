@@ -6,6 +6,8 @@ use App\Filters\CompanyFilter;
 use App\Model\CompanyDetail;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
+use App\Model\Company;
+
 
 class CompanyDetailsController extends Controller
 {
@@ -40,38 +42,27 @@ class CompanyDetailsController extends Controller
     }
 
 
-    public function search(Request $request)
-    {
-        $this->validate($request,['searchStr'=>'required|string']);
-        try {
-            $searchItem = $request->searchStr;
-            $data = CompanyDetail::query()
-                ->where('company_id', 'LIKE', "%{$searchItem}%")
-                ->orWhere('about_us', 'LIKE', "%{$searchItem}%")
-                ->get();
-                
-            if(!$data->isEmpty()){
-                return response()->json(['datas' => $data,'message' => DATA_FOUND], 200);
-            }else{
-                return response()->json(['datas' => $data,'message' => NO_DATA], 404);
-            }
-
-
-        } catch (\Exception $e) {
-            $errMgs = $e->getMessage();
-            return response()->json(['message' => $errMgs], 500);
-        }
-
-    }
-
-
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
         $data = $request->all();
         $data['logo'] = $this->uploadImage($request);
-
         return $this->model->update($data, $id);
+    }
+
+    public function companyDetailsCreateOrUpdate(Request $request, Company $company)
+    {
+        $this->validation($request);
+        try {
+            $company=  $company->findOrFail($request->company_id);
+            $data=$request->all();
+            $data['logo'] = $this->uploadImage($request);
+            $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
+            return redirect()->to('company/'.$request->company_id);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+
     }
 
 
