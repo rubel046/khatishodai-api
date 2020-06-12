@@ -63,6 +63,7 @@ resource('qc_staff_breakdowns', 'QcStaffBreakdownController');
 resource('rnd_staff_breakdowns', 'RndStaffBreakdownController');
 resource('revenue_breakdowns', 'RevenueBreakdownController');
 resource('export_percentage_breakdowns', 'ExportPercentageBreakdownController');
+$router->post('company/company_details/{company_id}', 'CompanyController@companyDtls');
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {

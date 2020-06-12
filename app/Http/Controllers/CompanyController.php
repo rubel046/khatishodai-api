@@ -26,40 +26,48 @@ class CompanyController extends Controller
     public function store(Request $request, Company $company)
     {
         $this->validation($request);
-
-
         try {
-            $datas=$request->all();
-            $datas['created_by']=auth()->user()->id;
-            $datas['ip_address']=$request->ip();
-            $companyData= $company->create($datas);
+            $datas = $request->all();
+            $datas['created_by'] = auth()->user()->id;
+            $datas['ip_address'] = $request->ip();
+            $companyData = $company->create($datas);
             $operationalAddress = $request->operational_address;
             $operationalAddress['addressable_id'] = $companyData->id;
             $operationalAddress['addressable_type'] = Company::class;
             $operationalAddress['address_type'] = 'operation';
 
             $registerAddress = $request->register_address;
-            $registerAddress['addressable_id'] =  $companyData->id;;
+            $registerAddress['addressable_id'] = $companyData->id;;
             $registerAddress['addressable_type'] = Company::class;
             $registerAddress['address_type'] = 'register';
 
             $company->operationalAddress()->updateOrCreate(['addressable_type' => Company::class], $operationalAddress);
             $company->registerAddress()->updateOrCreate(['addressable_type' => Company::class, 'address_type' => 'register'], $registerAddress);
-            $companyData['operational_address']=$operationalAddress;
-            $companyData['register_address']=$registerAddress;
+            $companyData['operational_address'] = $operationalAddress;
+            $companyData['register_address'] = $registerAddress;
             return response()->json(['result' => $companyData, 'message' => SAVE_SUCCESS], 201);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
 
+    }
 
+    public function companyDetails(Request $request, Company $company)
+    {
+        $this->validation($request);
+        try {
+
+            return 0;
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
 
     }
 
 
     public function show($id)
     {
-        return $this->model->with(['operationalAddress', 'registerAddress','company_certificate','CompanyDetail','CompanyFactory','CompanyNearestPort','CompanyPhoto','CompanyProduct','CompanyTradeInfo','CompanyTradeMembership'])->find($id);
+        return $this->model->with(['operationalAddress', 'registerAddress', 'company_certificate', 'CompanyDetail', 'CompanyFactory', 'CompanyNearestPort', 'CompanyPhoto', 'CompanyProduct', 'CompanyTradeInfo', 'CompanyTradeMembership'])->find($id);
     }
 
 
@@ -101,15 +109,15 @@ class CompanyController extends Controller
         $registerAddress['address_type'] = 'register';
 
         $company = Company::findOrFail($id);
-        try{
+        try {
             $company->operationalAddress()->update($operationalAddress);
             $company->registerAddress()->update($registerAddress);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             dd($e->getMessage());
         }
-        $data=$request->except('operational_address','register_address');
+        $data = $request->except('operational_address', 'register_address');
         // $company->registerAddress()->save([ 'addressable_type' => Company::class, 'address_type' => 'register'],$registerAddress);
-        return $this->model->update($data,$id);
+        return $this->model->update($data, $id);
     }
 
 

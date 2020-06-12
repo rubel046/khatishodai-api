@@ -17,7 +17,7 @@ class Company extends Model
 
     public function CompanyDetail()
     {
-        return $this->hasMany('App\Model\CompanyCertificate', 'company_id');
+        return $this->hasOne('App\Model\CompanyDetail', 'company_id');
     }
 
     public function CompanyFactory()

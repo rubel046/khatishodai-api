@@ -87,9 +87,9 @@ class CompanyDetailsController extends Controller
             'logo' => 'sometimes|image|mimes:jpeg,png,jpg|max:512',
             'about_us' => 'required|string',
             'mission' => 'required|string',
-            'vision' => 'required|string',
-            'youtube_link' => 'required|string',
-            'fb_link' => 'required|string',
+            'vision' => 'string',
+            'youtube_link' => 'string',
+            'fb_link' => 'string',
         ]);
     }
 
