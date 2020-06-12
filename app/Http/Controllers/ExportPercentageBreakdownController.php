@@ -52,7 +52,6 @@ class ExportPercentageBreakdownController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'status' => 'numeric',
         ]);
     }
 

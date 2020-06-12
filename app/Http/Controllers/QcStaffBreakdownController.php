@@ -52,7 +52,6 @@ class QcStaffBreakdownController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'status' => 'numeric',
         ]);
     }
 

@@ -53,7 +53,6 @@ class CompanyProductsController extends Controller
             'company_id' => 'required|numeric',
             'name' => 'required|string',
             'is_main' => 'required|numeric',
-            'status' => 'required|numeric',
         ]);
     }
 
