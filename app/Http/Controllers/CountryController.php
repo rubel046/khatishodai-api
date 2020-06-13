@@ -12,12 +12,13 @@ class CountryController extends Controller
 
     public function __construct(Country $model)
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => 'index']);
         $this->model = new Repository($model);
     }
 
     public function index()
     {
+        $this->middleware('guest');
         return $this->model->all();
     }
 
