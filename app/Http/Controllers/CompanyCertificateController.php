@@ -74,7 +74,6 @@ class CompanyCertificateController extends Controller
         return $this->model->update($data, $id);
     }
 
-
     public function destroy($id)
     {
         return $this->model->delete($id);

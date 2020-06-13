@@ -6,12 +6,15 @@ use App\Traits\FileUpload;
 use App\Filters\CompanyFilter;
 use App\Model\CompanyDetail;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Model\Company;
 
 
 class CompanyDetailsController extends Controller
 {
+    use ApiResponse;
+
     private $model;
 
     public function __construct(CompanyDetail $model, CompanyFilter $companyFilter)
@@ -42,6 +45,11 @@ class CompanyDetailsController extends Controller
         return $this->model->show($id);
     }
 
+    public function detailsByCompany($company_id)
+    {
+        return $this->showOne(CompanyDetail::whereCompanyId($company_id)->first());
+    }
+
 
     public function update(Request $request, $id)
     {
@@ -61,6 +69,9 @@ class CompanyDetailsController extends Controller
             $data['logo'] = $image;// $this->uploadImage($request);
             $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
             return redirect()->to('company/' . $request->company_id);
+            $data['logo'] = $this->uploadImage($request);
+            $details = $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
+            return $this->updatedSuccess($details);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }

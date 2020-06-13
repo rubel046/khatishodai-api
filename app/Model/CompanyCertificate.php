@@ -4,7 +4,8 @@ namespace App\Model;
 
 class CompanyCertificate extends Model
 {
-    protected $guarded = [];
+    protected $fillable = ['company_id', 'name', 'created_by', 'updated_by', 'reference_number', 'issued_by', 'start_date', 'end_date', 'certificate_photo_name', 'status'];
+
 
     public function company()
     {

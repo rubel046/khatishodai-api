@@ -5,7 +5,7 @@ namespace App\Model;
 class CompanyPhoto extends Model
 {
     //
-    protected $guarded = [];
+    protected $fillable = ['company_id', 'photo', 'status', 'created_by', 'updated_by'];
 
     public function company()
     {
