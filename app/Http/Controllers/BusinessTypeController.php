@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\BusinessType;
+use App\Model\BusinessType;
 use Illuminate\Http\Request;
 use App\Repositories\Repository;
 

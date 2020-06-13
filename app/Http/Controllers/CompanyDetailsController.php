@@ -65,11 +65,8 @@ class CompanyDetailsController extends Controller
         try {
             $company = $company->findOrFail($request->company_id);
             $data = $request->all();
-            $image = FileUpload::saveImages($request, 'logo', 'company_details_2');
-            $data['logo'] = $image;// $this->uploadImage($request);
-            $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
-            return redirect()->to('company/' . $request->company_id);
-            $data['logo'] = $this->uploadImage($request);
+            $image = FileUpload::saveImages($request, 'logo', 'company_details');
+            $data['logo'] = $image;
             $details = $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
             return $this->updatedSuccess($details);
         } catch (\Exception $e) {

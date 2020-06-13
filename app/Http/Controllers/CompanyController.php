@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Model\Company;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Mockery\CountValidator\Exception;
 
 class CompanyController extends Controller
 {
+    use ApiResponse;
     private $model;
 
     public function __construct(Company $company)
@@ -27,6 +29,7 @@ class CompanyController extends Controller
     {
         $this->validation($request);
         try {
+
             $datas = $request->all();
             $datas['created_by'] = auth()->user()->id;
             $datas['ip_address'] = $request->ip();
@@ -41,8 +44,10 @@ class CompanyController extends Controller
             $registerAddress['addressable_type'] = Company::class;
             $registerAddress['address_type'] = 'register';
 
-            $company->operationalAddress()->updateOrCreate(['addressable_type' => Company::class], $operationalAddress);
-            $company->registerAddress()->updateOrCreate(['addressable_type' => Company::class, 'address_type' => 'register'], $registerAddress);
+            $companyData->operationalAddress()->updateOrCreate(['addressable_type' => Company::class], $operationalAddress);
+            $companyData->registerAddress()->updateOrCreate(['addressable_type' => Company::class, 'address_type' => 'register'], $registerAddress);
+           //dd($request->business_types);
+            $companyData->businessTypes()->attach(1,['ip_address'=>'131.21']);
             $companyData['operational_address'] = $operationalAddress;
             $companyData['register_address'] = $registerAddress;
             return response()->json(['result' => $companyData, 'message' => SAVE_SUCCESS], 201);
@@ -56,30 +61,6 @@ class CompanyController extends Controller
     public function show($id)
     {
         return $this->model->with(['operationalAddress', 'registerAddress', 'company_certificate', 'CompanyDetail', 'CompanyFactory', 'CompanyNearestPort', 'CompanyPhoto', 'CompanyProduct', 'CompanyTradeInfo', 'CompanyTradeMembership'])->find($id);
-    }
-
-
-    public function search(Request $request)
-    {
-        $this->validate($request, ['searchStr' => 'required|string']);
-        try {
-            $searchItem = $request->searchStr;
-            $data = Company::query()
-                ->where('name', 'LIKE', "%{$searchItem}%")
-                ->orWhere('website', 'LIKE', "%{$searchItem}%")
-                ->get();
-            if (!$data->isEmpty()) {
-                return response()->json(['data' => $data, 'message' => DATA_FOUND], 200);
-            } else {
-                return response()->json(['data' => $data, 'message' => NO_DATA], 404);
-            }
-
-
-        } catch (\Exception $e) {
-            //dd($e);
-            return response()->json(['message' => ERROR_MSG], 500);
-        }
-
     }
 
 
@@ -100,6 +81,8 @@ class CompanyController extends Controller
         try {
             $company->operationalAddress()->update($operationalAddress);
             $company->registerAddress()->update($registerAddress);
+            //$company->assignedBusinessType()->update($request->business_type);
+
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -118,7 +101,7 @@ class CompanyController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
+            //'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
             'user_id' => 'required|numeric',
             'display_name' => 'required|string',
             'establishment_date' => 'required|date',

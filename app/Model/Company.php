@@ -64,4 +64,8 @@ class Company extends Model
     {
         return $this->belongsTo('App\Model\User');
     }
+    public function businessTypes()
+    {
+        return $this->belongsToMany('App\Model\BusinessType','company_business_types','company_id','business_type_id')->withPivot( 'created_by', 'updated_by', 'ip_address');
+    }
 }
