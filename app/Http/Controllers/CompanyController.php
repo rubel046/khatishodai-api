@@ -34,23 +34,19 @@ class CompanyController extends Controller
             $datas['created_by'] = auth()->user()->id;
             $datas['ip_address'] = $request->ip();
             $companyData = $company->create($datas);
+
             $operationalAddress = $request->operational_address;
-            $operationalAddress['addressable_id'] = $companyData->id;
-            $operationalAddress['addressable_type'] = Company::class;
             $operationalAddress['address_type'] = 'operation';
 
             $registerAddress = $request->register_address;
-            $registerAddress['addressable_id'] = $companyData->id;;
-            $registerAddress['addressable_type'] = Company::class;
             $registerAddress['address_type'] = 'register';
-
-            $companyData->operationalAddress()->updateOrCreate(['addressable_type' => Company::class], $operationalAddress);
-            $companyData->registerAddress()->updateOrCreate(['addressable_type' => Company::class, 'address_type' => 'register'], $registerAddress);
-           //dd($request->business_types);
-            $companyData->businessTypes()->attach(1,['ip_address'=>'131.21']);
+            $companyData->operationalAddress()->updateOrCreate([], $operationalAddress);
+            $companyData->registerAddress()->updateOrCreate([], $registerAddress);
+            $companyData->businessTypes()->sync($request->business_types);
             $companyData['operational_address'] = $operationalAddress;
             $companyData['register_address'] = $registerAddress;
-            return response()->json(['result' => $companyData, 'message' => SAVE_SUCCESS], 201);
+            $companyData['business_types'] = $request->business_types;
+            return $this->createdSuccess($companyData);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
@@ -68,27 +64,27 @@ class CompanyController extends Controller
     {
         $this->validation($request, $id);
         $operationalAddress = $request->operational_address;
-        $operationalAddress['addressable_id'] = $id;
-        $operationalAddress['addressable_type'] = Company::class;
         $operationalAddress['address_type'] = 'operation';
 
         $registerAddress = $request->register_address;
-        $registerAddress['addressable_id'] = $id;
-        $registerAddress['addressable_type'] = Company::class;
         $registerAddress['address_type'] = 'register';
 
-        $company = Company::findOrFail($id);
+        $companyData = Company::findOrFail($id);
         try {
-            $company->operationalAddress()->update($operationalAddress);
-            $company->registerAddress()->update($registerAddress);
-            //$company->assignedBusinessType()->update($request->business_type);
+            $companyData->operationalAddress()->updateOrCreate([], $operationalAddress);
+            $companyData->registerAddress()->updateOrCreate([], $registerAddress);
+            $companyData->businessTypes()->sync($request->business_types);
+
+            $companyData['operational_address'] = $operationalAddress;
+            $companyData['register_address'] = $registerAddress;
+            $companyData['business_types'] = $request->business_types;
 
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            return $this->errorResponse($e->getMessage());
         }
-        $data = $request->except('operational_address', 'register_address');
-        // $company->registerAddress()->save([ 'addressable_type' => Company::class, 'address_type' => 'register'],$registerAddress);
-        return $this->model->update($data, $id);
+        //$data = $request->except('operational_address', 'register_address');
+        $this->model->update($request->all(), $id);
+        return $this->updatedSuccess($companyData);
     }
 
 
@@ -101,7 +97,7 @@ class CompanyController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            //'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
+            'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
             'user_id' => 'required|numeric',
             'display_name' => 'required|string',
             'establishment_date' => 'required|date',
