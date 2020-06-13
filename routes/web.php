@@ -50,6 +50,7 @@ resource('division', 'DivisionController');
 resource('city', 'CityController');
 resource('area', 'AreaController');
 $router->post('company/company_details', 'CompanyDetailsController@companyDetailsCreateOrUpdate');
+$router->get('company/company_details/{company_id}', 'CompanyDetailsController@detailsByCompany');
 resource('company', 'CompanyController');
 resource('comp_certificates', 'CompanyCertificateController');
 resource('comp_details', 'CompanyDetailsController');

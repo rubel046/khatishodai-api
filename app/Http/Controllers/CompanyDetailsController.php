@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Filters\CompanyFilter;
 use App\Model\CompanyDetail;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Model\Company;
 
 
 class CompanyDetailsController extends Controller
 {
+    use ApiResponse;
+
     private $model;
 
     public function __construct(CompanyDetail $model, CompanyFilter $companyFilter)
@@ -41,6 +44,11 @@ class CompanyDetailsController extends Controller
         return $this->model->show($id);
     }
 
+    public function detailsByCompany($company_id)
+    {
+        return $this->showOne(CompanyDetail::whereCompanyId($company_id)->first());
+    }
+
 
     public function update(Request $request, $id)
     {
@@ -54,11 +62,11 @@ class CompanyDetailsController extends Controller
     {
         $this->validation($request);
         try {
-            $company=  $company->findOrFail($request->company_id);
-            $data=$request->all();
+            $company = $company->findOrFail($request->company_id);
+            $data = $request->all();
             $data['logo'] = $this->uploadImage($request);
-            $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
-            return redirect()->to('company/'.$request->company_id);
+            $details = $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
+            return $this->updatedSuccess($details);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
