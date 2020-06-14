@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Filters\CompanyFilter;
 use App\Model\CompanyFactory;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class CompanyFactoriesController extends Controller
 {
+    use ApiResponse;
     private $model;
 
     public function __construct(CompanyFactory $model, CompanyFilter $companyFilter)
@@ -23,10 +25,18 @@ class CompanyFactoriesController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(Request $request,CompanyFactory $companyFactory)
     {
         $this->validation($request);
-        return $this->model->create($request->all());
+        $data = $request->except('address');
+        //dd($request->address);
+        $data['created_by'] = auth()->user()->id;
+        $data['ip_address'] = $request->ip();
+        $companyFactoryData = $companyFactory->create($data);
+        $companyFactoryData->address()->create($request->address);
+        $companyFactoryData['address']=$request->address;
+        return $this->createdSuccess($companyFactoryData);
+
     }
 
 
@@ -36,36 +46,13 @@ class CompanyFactoriesController extends Controller
     }
 
 
-    public function search(Request $request)
-    {
-        $this->validate($request, ['searchStr' => 'required|string']);
-        try {
-            $searchItem = $request->searchStr;
-            $data = CompanyFactory::query()
-                ->where('company_id', 'LIKE', "%{$searchItem}%")
-                ->orWhere('location', 'LIKE', "%{$searchItem}%")
-                ->get();
-
-            if (!$data->isEmpty()) {
-                return response()->json(['datas' => $data, 'message' => DATA_FOUND], 200);
-            } else {
-                return response()->json(['datas' => $data, 'message' => NO_DATA], 404);
-            }
-
-
-        } catch (\Exception $e) {
-            $errMgs = $e->getMessage();
-            return response()->json(['message' => $errMgs], 500);
-        }
-
-    }
-
-
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
-        $data = $request->all();
-        return $this->model->update($data, $id);
+        $companyFactory=CompanyFactory::findOrFail($id);
+        $companyFactory->address()->updateOrCreate(['addressable_id' => $id, 'addressable_type' => CompanyFactory::class], $request->address);
+        $this->model->update($request->all(), $id);
+        return $this->updatedSuccess($request->except('_method'));
     }
 
 
@@ -78,13 +65,11 @@ class CompanyFactoriesController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|numeric',
-            'location' => 'required|string',
             'size_id' => 'required|numeric',
             'staff_number_id' => 'required|numeric',
             'rnd_staff_id' => 'required|numeric',
             'production_line_id' => 'required|numeric',
             'annual_output_id' => 'required|numeric',
-            'status' => 'required|numeric',
         ]);
     }
 
