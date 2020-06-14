@@ -36,7 +36,6 @@ class AuthController extends Controller
             'companyName' => 'required|string',
         ]);
 
-        // return response()->json(['test'=> rand(100000,999999)]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), 'messages' => 'User registration failed, Data not save to record.'], 422);
         }
@@ -82,10 +81,10 @@ class AuthController extends Controller
 
             // Insert Company Name
             $companyData = new Company();
-            $companyData->user_id=$user->id;
-            $companyData->name=$request->input('companyName');
-            $companyData->ip_address=$request->ip();
-            $companyData->created_by=$user->id;
+            $companyData->user_id = $user->id;
+            $companyData->name = $request->input('companyName');
+            $companyData->ip_address = $request->ip();
+            $companyData->created_by = $user->id;
             $companyData->save();
 
             $toName = $user->first_name . ' ' . $user->last_name;
@@ -121,68 +120,18 @@ class AuthController extends Controller
                     'phone' => $phone,
                     'name' => $toName
                 ];
-
-                $verificationToken = rand(100000, 999999);
-                // save or update otp
-                $user->verificationToken = $verificationToken;
-                $user->save();
-                /*User::updateOrCreate(
-                   ['phonea' => $phone],
-                   ['verificationToken' => $verificationToken ]
-               );*/
-
-                try {
-                    // Sending Mobile OTP
-                    if ($this->checkOtpSent($phone) == 0) {
-                        //$otp = mt_rand(100000, 999999);
-                        $message = "Your tizaara mobile verification OTP code is " . $verificationToken;
-                        $post_url = 'https://portal.smsinbd.com/smsapi/';
-                        $post_values = array(
-                            'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
-                            'type' => 'text',  // unicode or text
-                            'senderid' => '8801552146120',
-                            'contacts' => '88' . $phone,
-                            'msg' => $message,
-                            'method' => 'api'
-                        );
-
-                        $post_string = "";
-                        foreach ($post_values as $key => $value) {
-                            $post_string .= "$key=" . urlencode($value) . "&";
-                        }
-                        $post_string = rtrim($post_string, "& ");
-
-
-                        $request = curl_init($post_url);
-                        curl_setopt($request, CURLOPT_HEADER, 0);
-                        curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
-                        curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
-                        curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
-                        $post_response = curl_exec($request);
-                        curl_close($request);
-
-                        $responses = array();
-                        $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
-
-                        /* if($array){
-                             echo $array['status'] ;
-                             echo $array['CamID'] ;
-                             dd($array);
-                         }*/
-                    }
+                // Sending Mobile OTP
+                if ($this->sendPhoneCode($phone, 'greenweb')) {
                     return response()->json([
                         'user' => $data,
                         'signUpBy' => 'phone',
                         'message' => 'Registration form submitted successfully. Please, Check your mobile ' . $phone . ' for verification OTP to verify'], 201);
-                } catch (\Exception $e) {
-                    return response()->json(['messages' => 'Registration form submitted successfully!, Mobile OTP sending failed. Contact with admin'], 409);
+                } else {
+                    return response()->json(['messages' => 'Registration form submitted successfully!, Mobile OTP sending failed. Contact with admin'], 201);
                 }
-
             }
 
-
         } catch (\Exception $e) {
-            //return error message
             return response()->json(['messages' => 'User Registration Failed!'], 409);
         }
 
@@ -221,9 +170,6 @@ class AuthController extends Controller
                 'status' => 1
             ];
         }
-        //return response()->json(['data'=>$login]);
-        // set Expiry TTL
-        // $credentials, ['exp' => Carbon\Carbon::now()->addDays(7)->timestamp]
         if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
             return response()->json(['errors' => ['message' => 'User Not Found | Unauthorized']], 404);
         }
@@ -261,10 +207,9 @@ class AuthController extends Controller
             Mail::send('mail.verified_success_email', $data, function ($message) use ($toName, $toEmail) {
                 $message->to($toEmail)->subject('Tizaara Registration Verification Success!');
             });
-            echo 'Verification email is success! Click to login <a href="http://www.web.tizaara.com/account/login">www.tizaara.com/account/login</a>';
+            echo 'Verification email is success! Click to login <a href="' . config('services.siteUrl') . '/account/login' . '">www.tizaara.com/account/login</a>';
             return;
             return View('signup_verify_success');
-            return 'Verification email is success!';
 
         }
     }
@@ -284,6 +229,7 @@ class AuthController extends Controller
 
     public function testOtp($phone)
     {
+        if ($this->checkOtpSent($phone) == 0) $this->sendPhoneCode($phone);
         // for check balance
         /*$post_url = 'https://portal.smsinbd.com/api/' ;
         $post_values = array(
@@ -314,92 +260,6 @@ class AuthController extends Controller
             print_r($array);
         }
         */
-        if ($this->checkOtpSent($phone) == 0) {
-
-            // sms in bd api
-            //https://portal.smsinbd.com/smsapi?api_key=b1af6725e5e788d3e3096803f5953ef913c56873&type=text&contacts=8801814111176&senderid=8801552146120&msg=test&method=api
-            $post_url = 'https://portal.smsinbd.com/smsapi/';
-            $post_values = array(
-                'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
-                'type' => 'text',  // unicode or text
-                'contacts' => '8801814111176',
-                'senderid' => '8801552146120',
-                'msg' => 'test',
-                'method' => 'api'
-            );
-
-            $post_string = "";
-            foreach ($post_values as $key => $value) {
-                $post_string .= "$key=" . urlencode($value) . "&";
-            }
-            $post_string = rtrim($post_string, "& ");
-
-            $request = curl_init();
-            curl_setopt($request, CURLOPT_URL, $post_url);
-            curl_setopt($request, CURLOPT_ENCODING, '');
-            curl_setopt($request, CURLOPT_HEADER, 0);
-            curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
-            //curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
-            curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query($post_values));
-            curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
-            $post_response = curl_exec($request);
-            curl_close($request);
-            dd($post_response);
-            $responses = array();
-            $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
-
-            if ($array) {
-                echo $array['status'];
-
-                echo $array['CamID'];
-
-                print_r($array);
-            }
-            die('not send');
-            // end sms in bd
-
-
-            // greenweb sms
-            $otp = $verificationToken = rand(100000, 999999);
-            $to = $phone;//'01814111176' ;
-            $token = "82445cfa4e41f7df23807a144bbcdae6";
-            $message = "Your test mobile verification OTP code is " . $otp;
-
-            $url = "http://api.greenweb.com.bd/api.php";
-            // $mobileOtp=new Mobile_otp();
-
-            $data = array(
-                'to' => "$to",
-                'message' => "$message",
-                'token' => "$token"
-            );
-            // Add parameters in key value
-            $ch = curl_init(); // Initialize cURL
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_ENCODING, '');
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $smsResult = curl_exec($ch);
-            $status = explode(':', $smsResult)[0];
-            dd($status);
-            if ($smsResult !== false) {
-                if ($status != 'Error') {
-                    // save or update otp
-                    User::updateOrCreate(
-                        ['phone' => $phone],
-                        ['verificationToken' => $otp]
-                    );
-                    die(' sent');
-                } else {
-                    Session::flash('error', 'Transaction is Falied');
-                    return redirect()->back()->withErrors(['contact_no' => ['Invalid mobile No, check your contact number correctly']])->withInput();
-                }
-            } else {
-                Session::flash('error', 'Transaction is Falied');
-                return redirect()->back()->withErrors(['contact_no' => ['Connection Problem']])->withInput();
-            }
-        }
-        die('not sent');
     }
 
 
@@ -450,6 +310,90 @@ class AuthController extends Controller
         $mgs = 'Verification Failed! Please, try again with correct OTP sent to ' . $request->phone;
         return response()->json(['status' => $res, 'user' => ['phone' => $request->phone], 'messages' => $mgs]);
 
+
+    }
+
+    private function sendPhoneCode($phone, $otp, $gateWay = 'smsbd')
+    {
+        $sentStatus = false;
+        $message = "Your tizaara mobile verification OTP code is " . $otp;
+
+        if ($gateWay == 'greenweb') {
+            // greenweb sms
+
+            $to = $phone ?? '01814111176';
+            $token = "82445cfa4e41f7df23807a144bbcdae6";
+            $url = "http://api.greenweb.com.bd/api.php";
+            $data = array(
+                'to' => $to,
+                'message' => $message,
+                'token' => $token
+            );
+            // Add parameters in key value
+            $ch = curl_init(); // Initialize cURL
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_ENCODING, '');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $smsResult = null;//curl_exec($ch);
+            $status = null;//explode(':', $smsResult)[0];
+            if ($smsResult !== false) {
+                if ($status != 'Error') {
+                    // save or update otp
+                    User::updateOrCreate(
+                        ['phone' => $phone],
+                        ['verificationToken' => $otp]
+                    );
+                    $sentStatus = true;
+                } else {
+                    // Invalid Mobile Number
+                }
+            } else {
+                // Problem with connection
+            }
+        } else {
+            // sms in bd api
+            //https://portal.smsinbd.com/smsapi?api_key=b1af6725e5e788d3e3096803f5953ef913c56873&type=text&contacts=8801814111176&senderid=8801552146120&msg=test&method=api
+            $post_url = 'https://portal.smsinbd.com/smsapi/';
+            $post_values = array(
+                'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
+                'type' => 'text',  // unicode or text
+                'contacts' => $phone ?? '8801814111176',
+                'senderid' => '8801552146120',
+                'msg' => 'test',
+                'method' => 'api'
+            );
+
+            $post_string = "";
+            foreach ($post_values as $key => $value) {
+                $post_string .= "$key=" . urlencode($value) . "&";
+            }
+            $post_string = rtrim($post_string, "& ");
+            $request = curl_init();
+            curl_setopt($request, CURLOPT_URL, $post_url);
+            curl_setopt($request, CURLOPT_ENCODING, '');
+            curl_setopt($request, CURLOPT_HEADER, 0);
+            curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
+            //curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
+            curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query($post_values));
+            curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
+            $post_response = curl_exec($request);
+            curl_close($request);
+            $responses = array();
+            $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
+
+            if ($array) {
+                // save or update otp
+                User::updateOrCreate(
+                    ['phone' => $phone],
+                    ['verificationToken' => $otp]
+                );
+                $sentStatus = true;
+            }
+            // end sms in bd
+        }
+
+        return $sentStatus;
 
     }
 

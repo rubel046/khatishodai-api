@@ -8,7 +8,7 @@
 
 Hello <strong> World!</strong>,
 <p>
-    This is test email form Tizaara.com
+    This is test email form Tizaara.com <a href="{{config('services.siteUrl') . '/account/login'}}"> Login</a>.
     {{--{{$body}}--}}
 </p>
 </body>

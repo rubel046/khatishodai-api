@@ -16,6 +16,7 @@ class EmailController extends Controller {
     }*/
     //send email
     public function sendTestEmail(Request $request) {
+        return view('mail.test_mail');
         $this->validate($request, [
             'email' => 'required|email'
         ]);
