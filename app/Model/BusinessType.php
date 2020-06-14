@@ -5,7 +5,6 @@ namespace App\Model;
 class BusinessType extends Model
 {
     protected $fillable = ['name', 'status', 'created_by', 'updated_by', 'created_at', 'ip_address'];
-    protected $table= ['name', 'status', 'created_by', 'updated_by', 'created_at', 'ip_address'];
 
     public function companies()
     {
