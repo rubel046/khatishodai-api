@@ -82,7 +82,6 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
-        //$data = $request->except('operational_address', 'register_address');
         $this->model->update($request->all(), $id);
         return $this->updatedSuccess($companyData);
     }

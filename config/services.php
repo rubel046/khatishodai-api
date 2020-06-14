@@ -13,6 +13,6 @@ return [
         'redirect'      => env('GOOGLE_CALLBACK_URL'),
     ],
 
-    'siteUrl'=>env('SITE_URL', 'http://web.trizaara.com')
+    'siteUrl'=>env('SITE_URL', 'http://tizaara.com')
 
 ];
