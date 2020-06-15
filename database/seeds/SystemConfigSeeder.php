@@ -15,17 +15,15 @@ class SystemConfigSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
         DB::table("system_configs")->truncate();
-        //$clinet = new \GuzzleHttp\Client();
         $fileConf = file_get_contents(base_path('systemconfig.json'));
-        //$sysConfData = collect(json_decode($fileConf));
-
-        collect(json_decode($fileConf))->map(function ($sysConfData){
+        collect(json_decode($fileConf))->map(function ($sysConfData) {
             $sysConf = new SystemConfig();
             $sysConf->name = $sysConfData->name;
             $sysConf->alias = $sysConfData->alias;
-            $sysConf->data = $sysConfData->data;
+            $sysConf->data = json_encode($sysConfData->data);
             $sysConf->status = 1;
             $sysConf->save();
         });
+
     }
 }
