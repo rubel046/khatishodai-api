@@ -65,6 +65,7 @@ resource('qc_staff_breakdowns', 'QcStaffBreakdownController');
 resource('rnd_staff_breakdowns', 'RndStaffBreakdownController');
 resource('revenue_breakdowns', 'RevenueBreakdownController');
 resource('export_percentage_breakdowns', 'ExportPercentageBreakdownController');
+resource('system_config', 'SystemConfigController');
 
 // API route group mail
 $router->group(['prefix' => 'mail'], function () use ($router) {
