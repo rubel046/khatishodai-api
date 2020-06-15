@@ -15,9 +15,10 @@ class CompanyFactoryTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        foreach (range(1, 100) as $index) {
+        foreach (range(1, 50) as $index) {
             DB::table('company_factories')->insert([
                 'company_id' => Company::all()->random()->id,
+                'name' => $faker->text(20),
                 'size_id' => $faker->numberBetween(1, 20),
                 'staff_number_id' => $faker->numberBetween(1, 20),
                 'rnd_staff_id' => $faker->numberBetween(1, 20),
