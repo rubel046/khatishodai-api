@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Number of Employee",
+    "alias": "employee_range",
+    "data": "[{label:'1 to 5', value: '1'},{label:'5 to 10', value: '2'},{label: '10-100': value: '3'}]",
+    "status": "1"
+  },
+  {
+    "name": "Type of ownership",
+    "alias": "ownership_type",
+    "data": "[{label:'Public', value: '1'},{label:'Private', value: '2'}]",
+    "status": "1"
+  },
+  {
+    "name": "turnover Name",
+    "alias": "turnover_id",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "Membership Plan",
+    "alias": "membership_plan",
+    "data": "[{label:'Silver', value: '1'},{label:'Gold', value: '2'},{label: 'Platinum': value: '3'},{label: 'Bronze': value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "Qc Staff Breakdown",
+    "alias": "",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "Export percent",
+    "alias": "export_percent_id",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "RND staff",
+    "alias": "rnd_staff_id",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "production line",
+    "alias": "production_line_id",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "Annual output ",
+    "alias": "annual_output_id",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  },
+  {
+    "name": "Annual Revenue",
+    "alias": "annual_revenue_id",
+    "data": "[{label:'value 1', value: '1'},{label:'value 2', value: '2'},{label:'value 3', value: '3',{label:'value 4', value: '4'}]",
+    "status": "1"
+  }
+]

@@ -42,7 +42,7 @@ class CompanyFactoriesController extends Controller
 
     public function show($id)
     {
-        return $this->model->show($id);
+        return $this->model->with(['address'])->find($id);
     }
 
 
