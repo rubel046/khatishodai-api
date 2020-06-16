@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDistrictIdToAddress extends Migration
+class UpdateAttributesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddDistrictIdToAddress extends Migration
      */
     public function up()
     {
-        Schema::table('addresses', function (Blueprint $table) {
-            $table->integer('district_id')->unsigned()->after('division_id');
+        Schema::table('attributes', function (Blueprint $table) {
+            $table->string('type')->nullable()->change();
         });
     }
 
@@ -25,8 +25,6 @@ class AddDistrictIdToAddress extends Migration
      */
     public function down()
     {
-        Schema::table('addresses', function (Blueprint $table) {
-            $table->dropColumn(['district_id']);
-        });
+        //
     }
 }
