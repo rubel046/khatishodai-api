@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 class CompanyFactoriesController extends Controller
 {
     use ApiResponse;
+
     private $model;
 
     public function __construct(CompanyFactory $model, CompanyFilter $companyFilter)
@@ -25,7 +26,7 @@ class CompanyFactoriesController extends Controller
     }
 
 
-    public function store(Request $request,CompanyFactory $companyFactory)
+    public function store(Request $request, CompanyFactory $companyFactory)
     {
         $this->validation($request);
         $data = $request->except('address');
@@ -34,7 +35,7 @@ class CompanyFactoriesController extends Controller
         $data['ip_address'] = $request->ip();
         $companyFactoryData = $companyFactory->create($data);
         $companyFactoryData->address()->create($request->address);
-        $companyFactoryData['address']=$request->address;
+        $companyFactoryData['address'] = $request->address;
         return $this->createdSuccess($companyFactoryData);
 
     }
@@ -42,14 +43,14 @@ class CompanyFactoriesController extends Controller
 
     public function show($id)
     {
-        return $this->model->with(['address'])->find($id);
+        return $this->showOne($this->model->with(['address'])->find($id));
     }
 
 
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
-        $companyFactory=CompanyFactory::findOrFail($id);
+        $companyFactory = CompanyFactory::findOrFail($id);
         $companyFactory->address()->updateOrCreate(['addressable_id' => $id, 'addressable_type' => CompanyFactory::class], $request->address);
         $this->model->update($request->all(), $id);
         return $this->updatedSuccess($request->except('_method'));

@@ -4,7 +4,7 @@ namespace App\Model;
 
 class CompanyNearestPort extends Model
 {
-    protected $guarded = [];
+    protected $fillable = ['name', 'company_id', 'address', 'status', 'ip_address'];
 
     public function company()
     {
