@@ -4,7 +4,7 @@ namespace App\Model;
 
 class CompanyTradeInfo extends Model
 {
-    protected $guarded = [];
+    protected $fillable = ['annual_revenue_id', 'company_id', 'export_percent_id', 'export_started_year', 'ip_address', 'status'];
 
     public function company()
     {

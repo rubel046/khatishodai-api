@@ -22,7 +22,8 @@ class CreateCompanyNearestPortsTable extends Migration
         $schema->create('company_nearest_ports', function (CustomBlueprint $table) {
             $table->id();
             $table->integer('company_id');
-            $table->string('name',150)->nullable();
+            $table->string('name', 150)->nullable();
+            $table->string('address', 150)->nullable();
             $table->commonFields();
         });
     }
