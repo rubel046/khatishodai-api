@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Model\SystemConfig;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SystemConfigController extends Controller
 {
@@ -12,13 +13,15 @@ class SystemConfigController extends Controller
 
     public function __construct(SystemConfig $model)
     {
-        $this->middleware('auth');
+        //$this->middleware('auth');
         $this->model = new Repository($model);
     }
 
     public function index()
     {
-        return $this->model->all();
+        return Cache::rememberForever('system_config', function () {
+            return $this->model->all();
+        });
     }
 
 
