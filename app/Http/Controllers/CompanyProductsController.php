@@ -28,25 +28,33 @@ class CompanyProductsController extends Controller
     public function store(Request $request)
     {
         $this->validation($request);
-        $productsData=[];
-        foreach($request->main_products as $key=> $value){
-            $productsData[]=[
-                'company_id'=>$request->company_id,
-                'name'=>$value,
-                'is_main'=>1,
-                'created_by'=>auth()->id(),
-                'ip_address'=>request()->ip()
-            ];
+        $productsData = [];
+        $mainProducts = is_array($request->main_products) ? array_filter($request->main_products) : [];
+        $otherProducts = is_array($request->other_products) ? array_filter($request->other_products) : [];
+        if (!empty($mainProducts)) {
+            foreach ($mainProducts as $key => $value) {
+                $productsData[] = [
+                    'company_id' => $request->company_id,
+                    'name' => $value,
+                    'is_main' => 1,
+                    'created_by' => auth()->id(),
+                    'ip_address' => request()->ip()
+                ];
+            }
         }
-        foreach($request->other_products as $key=> $value){
-            $productsData[]=[
-                'company_id'=>$request->company_id,
-                'name'=>$value,
-                'is_main'=>0,
-                'created_by'=>auth()->id(),
-                'ip_address'=>request()->ip()
-            ];
+
+        if (!empty($otherProducts)) {
+            foreach ($otherProducts as $key => $value) {
+                $productsData[] = [
+                    'company_id' => $request->company_id,
+                    'name' => $value,
+                    'is_main' => 0,
+                    'created_by' => auth()->id(),
+                    'ip_address' => request()->ip()
+                ];
+            }
         }
+
         CompanyProduct::insert($productsData);
         return $this->createdSuccess($request->all());
     }
@@ -59,48 +67,56 @@ class CompanyProductsController extends Controller
 
     public function companyProductDetails($company_id)
     {
-        $data=CompanyProduct::whereCompanyId($company_id)->get();
-        $productsData=[
-            'company_id'=>$company_id,
+        $data = CompanyProduct::whereCompanyId($company_id)->get();
+        $productsData = [
+            'company_id' => $company_id,
         ];
-        foreach($data as $value){
-            if($value->is_main==1){
-                $productsData['main_products'][]=$value->name;
-            }else{
-                $productsData['other_products'][]=$value->name;
+        foreach ($data as $value) {
+            if ($value->is_main == 1) {
+                $productsData['main_products'][] = $value->name;
+            } else {
+                $productsData['other_products'][] = $value->name;
             }
         }
         return $this->showMessage($productsData);
     }
 
-    public function companyProductsCreateOrUpdate(Request $request,CompanyProduct $companyProduct)
+    public function companyProductsCreateOrUpdate(Request $request, CompanyProduct $companyProduct)
     {
         $this->validation($request);
         try {
 
-           // CompanyProduct::where('company_id',$request->company_id)->delete();
-            CompanyProduct::where('company_id',$request->company_id)->forceDelete();
-            $productsData=[];
-            foreach($request->main_products as $key=> $value){
-                $productsData[]=[
-                    'company_id'=>$request->company_id,
-                    'name'=>$value,
-                    'is_main'=>1,
-                    'created_by'=>auth()->id(),
-                    'updated_by'=>auth()->id(),
-                    'ip_address'=>request()->ip()
-                ];
+            // CompanyProduct::where('company_id',$request->company_id)->delete();
+            CompanyProduct::where('company_id', $request->company_id)->forceDelete();
+            $productsData = [];
+            $mainProducts = is_array($request->main_products) ? array_filter($request->main_products) : [];
+            $otherProducts = is_array($request->other_products) ? array_filter($request->other_products) : [];
+
+            if (!empty($mainProducts)) {
+                foreach ($mainProducts as $key => $value) {
+                    $productsData[] = [
+                        'company_id' => $request->company_id,
+                        'name' => $value,
+                        'is_main' => 1,
+                        'created_by' => auth()->id(),
+                        'ip_address' => request()->ip()
+                    ];
+                }
             }
-            foreach($request->other_products as $key=> $value){
-                $productsData[]=[
-                    'company_id'=>$request->company_id,
-                    'name'=>$value,
-                    'is_main'=>0,
-                    'created_by'=>auth()->id(),
-                    'updated_by'=>auth()->id(),
-                    'ip_address'=>request()->ip()
-                ];
+
+            if (!empty($otherProducts)) {
+                foreach ($otherProducts as $key => $value) {
+                    $productsData[] = [
+                        'company_id' => $request->company_id,
+                        'name' => $value,
+                        'is_main' => 0,
+                        'created_by' => auth()->id(),
+                        'ip_address' => request()->ip()
+                    ];
+                }
             }
+
+
             CompanyProduct::insert($productsData);
             return $this->updatedSuccess($request->all());
 
@@ -128,8 +144,10 @@ class CompanyProductsController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|numeric',
-            "main_products"    => "required|array",
-            "other_products"    => "array",
+            "main_products" => "required_without:other_products|array|min:1",
+            "main_products.*" => "required|string",
+            "other_products" => "required_without:main_products|min:1",
+            "other_products.*" => "required|string",
         ]);
     }
 
