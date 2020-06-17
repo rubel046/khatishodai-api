@@ -6,7 +6,7 @@ namespace App\Model;
 class CompanyProduct extends Model
 {
     //
-    protected $guarded = [];
+    protected $fillable = ['name', 'company_id', 'is_main', 'status', 'created_by'];
 
     public function company()
     {

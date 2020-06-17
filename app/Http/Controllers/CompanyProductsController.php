@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Filters\CompanyFilter;
 use App\Model\CompanyProduct;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class CompanyProductsController extends Controller
 {
+    use ApiResponse;
     private $model;
 
     public function __construct(CompanyProduct $model, CompanyFilter $companyFilter)
@@ -19,14 +21,34 @@ class CompanyProductsController extends Controller
 
     public function index()
     {
-        return $this->model->all();
+        return $this->model->paginate();
     }
 
 
     public function store(Request $request)
     {
         $this->validation($request);
-        return $this->model->create($request->all());
+        $productsData=[];
+        foreach($request->main_products as $key=> $value){
+            $productsData[]=[
+                'company_id'=>$request->company_id,
+                'name'=>$value,
+                'is_main'=>1,
+                'created_by'=>auth()->id(),
+                'ip_address'=>request()->ip()
+            ];
+        }
+        foreach($request->other_products as $key=> $value){
+            $productsData[]=[
+                'company_id'=>$request->company_id,
+                'name'=>$value,
+                'is_main'=>0,
+                'created_by'=>auth()->id(),
+                'ip_address'=>request()->ip()
+            ];
+        }
+        CompanyProduct::insert($productsData);
+        return $this->createdSuccess($request->all());
     }
 
 
@@ -34,6 +56,61 @@ class CompanyProductsController extends Controller
     {
         return $this->model->show($id);
     }
+
+    public function companyProductDetails($company_id)
+    {
+        $data=CompanyProduct::whereCompanyId($company_id)->get();
+        $productsData=[
+            'company_id'=>$company_id,
+        ];
+        foreach($data as $value){
+            if($value->is_main==1){
+                $productsData['main_products'][]=$value->name;
+            }else{
+                $productsData['other_products'][]=$value->name;
+            }
+        }
+        return $this->showMessage($productsData);
+    }
+
+    public function companyProductsCreateOrUpdate(Request $request,CompanyProduct $companyProduct)
+    {
+        $this->validation($request);
+        try {
+
+           // CompanyProduct::where('company_id',$request->company_id)->delete();
+            CompanyProduct::where('company_id',$request->company_id)->forceDelete();
+            $productsData=[];
+            foreach($request->main_products as $key=> $value){
+                $productsData[]=[
+                    'company_id'=>$request->company_id,
+                    'name'=>$value,
+                    'is_main'=>1,
+                    'created_by'=>auth()->id(),
+                    'updated_by'=>auth()->id(),
+                    'ip_address'=>request()->ip()
+                ];
+            }
+            foreach($request->other_products as $key=> $value){
+                $productsData[]=[
+                    'company_id'=>$request->company_id,
+                    'name'=>$value,
+                    'is_main'=>0,
+                    'created_by'=>auth()->id(),
+                    'updated_by'=>auth()->id(),
+                    'ip_address'=>request()->ip()
+                ];
+            }
+            CompanyProduct::insert($productsData);
+            return $this->updatedSuccess($request->all());
+
+            //$data=CompanyProduct::whereCompanyId($request->company_id)->get();
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+
+    }
+
 
     public function update(Request $request, $id)
     {
@@ -51,8 +128,8 @@ class CompanyProductsController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|numeric',
-            'name' => 'required|string',
-            'is_main' => 'required|numeric',
+            "main_products"    => "required|array",
+            "other_products"    => "array",
         ]);
     }
 
