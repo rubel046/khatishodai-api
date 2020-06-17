@@ -74,7 +74,7 @@ class MenuOperationController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|unique:operations,name' . ($id ? ', ' . $id : ''),
-            'status' => 'required|numeric'
+            'status' => 'numeric'
         ]);
     }
 
