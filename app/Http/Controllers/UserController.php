@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
@@ -17,6 +18,7 @@ class UserController extends Controller
      *
      * @return void
      */
+    use ApiResponse;
     private $model;
 
     public function __construct(User $user)
@@ -32,7 +34,58 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return response()->json(['user' => auth()->user()->load('address')->load('company')], 200);
+        /*
+         % of profile completion will be defined as per the below weights -
+            Personal information: 50
+            Company basic: 25
+            Company detail: 5
+            Certification: 10
+            Factory details: 5
+            Trade details: 5
+         * */
+        $personalInfo = 50;
+        $companyBasic = 25;
+        $companyDtls = 5;
+        $companyCertification = 10;
+        $companyFactoryDtls = 5;
+        $companyTrade = 5;
+        $authUserData = auth()->user()->load('address')->load('company')->toArray();
+
+        if ($authUserData['photo'] == '') $personalInfo -= 3;
+        if ($authUserData['email'] == '') $personalInfo -= 3;
+        if ($authUserData['phone'] == '') $personalInfo -= 3;
+        if ($authUserData['telephone'] == '') $personalInfo -= 3;
+        if ($authUserData['job_title'] == '') $personalInfo -= 3;
+        if (empty($authUserData['address'])) $personalInfo -= 25;
+
+        $customerCompany = Company::whereUserId(auth()->id())->with('operationalAddress', 'registerAddress', 'CompanyDetail', 'company_certificate', 'CompanyFactory', 'CompanyTradeInfo')->get()->toArray();
+        if (!empty($customerCompany)) {
+            if ($customerCompany[0]['display_name'] == '') --$companyBasic;
+            if ($customerCompany[0]['establishment_date'] == '') --$companyBasic;
+            if ($customerCompany[0]['website'] == '') --$companyBasic;
+            if ($customerCompany[0]['email'] == '') --$companyBasic;
+            if ($customerCompany[0]['phone'] == '') --$companyBasic;
+            if ($customerCompany[0]['cell'] == '') --$companyBasic;
+            if ($customerCompany[0]['fax'] == '') --$companyBasic;
+            if ($customerCompany[0]['number_of_employee'] == '') --$companyBasic;
+            if ($customerCompany[0]['ownership_type'] == '') --$companyBasic;
+            if ($customerCompany[0]['ownership_type'] == '') --$companyBasic;
+            if (empty($customerCompany[0]['operational_address'])) $companyBasic -= 5;
+            if (empty($customerCompany[0]['register_address'])) $companyBasic -= 5;
+
+            if (empty($customerCompany[0]['company_detail'])) $companyDtls = 0;
+            if (empty($customerCompany[0]['company_certificate'])) $companyCertification = 0;
+            if (empty($customerCompany[0]['company_factory'])) $companyFactoryDtls = 0;
+            if (empty($customerCompany[0]['company_trade_info'])) $companyTrade = 0;
+
+        } else {
+            $companyBasic = 0;
+        }
+
+        $profileCompletion = $personalInfo + $companyBasic + $companyDtls + $companyCertification + $companyFactoryDtls + $companyTrade;
+        $customerDetailsInfo = ['user' => $authUserData, 'profile_completion' => $profileCompletion];
+        // return $this->showMessage($customerDetailsInfo);
+        return response()->json($customerDetailsInfo, 200);
     }
 
     /**
