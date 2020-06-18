@@ -31,6 +31,7 @@ class CompanyController extends Controller
         try {
 
             $datas = $request->all();
+            $datas['user_id'] = auth()->user()->id;
             $datas['created_by'] = auth()->user()->id;
             $datas['ip_address'] = $request->ip();
             $companyData = $company->create($datas);
