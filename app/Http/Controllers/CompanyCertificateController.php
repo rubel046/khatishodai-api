@@ -89,7 +89,7 @@ class CompanyCertificateController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'certificate_photo_name' => 'required|image|mimes:jpeg,png,jpg|max:512',
-            'status' => 'required|numeric',
+            'status' => 'numeric',
         ]);
     }
 
