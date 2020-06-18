@@ -4,21 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Model\Category;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use ApiResponse;
+
     private $model;
 
     public function __construct(Category $category)
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => 'index']);
         $this->model = new Repository($category);
     }
 
     public function index()
     {
-        return $this->model->paginate();
+        return $this->showAll(Category::whereNull('parent_id')->get());
     }
 
 
@@ -33,7 +36,6 @@ class CategoryController extends Controller
     }
 
 
-
     public function show($id)
     {
         return $this->model->show($id);
@@ -41,16 +43,16 @@ class CategoryController extends Controller
 
     public function search(Request $request)
     {
-        $this->validate($request,['searchStr'=>'required|string']);
+        $this->validate($request, ['searchStr' => 'required|string']);
         try {
             $searchItem = $request->searchStr;
             $data = Category::query()
                 ->where('name', 'LIKE', "%{$searchItem}%")
                 ->get();
-            if(!$data->isEmpty()){
-                return response()->json(['data' => $data,'message' => 'Result  with this query'], 200);
-            }else{
-                return response()->json(['data' => $data,'message' => 'No data found!'], 404);
+            if (!$data->isEmpty()) {
+                return response()->json(['data' => $data, 'message' => 'Result  with this query'], 200);
+            } else {
+                return response()->json(['data' => $data, 'message' => 'No data found!'], 404);
             }
 
 
