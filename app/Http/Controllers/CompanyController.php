@@ -96,18 +96,17 @@ class CompanyController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'website' => 'required|string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
-            'user_id' => 'required|numeric',
+            'website' => 'string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
             'display_name' => 'required|string',
             'establishment_date' => 'required|date',
             'office_space' => 'string',
             'email' => 'required|email',
             'phone' => 'required|string',
-            'cell' => 'required|string',
-            'fax' => 'required|string',
+            'cell' => 'string',
+            'fax' => 'string',
             'number_of_employee' => 'required|numeric',
             'ownership_type' => 'required|numeric',
-            'turnover_id' => 'required|numeric',
+            'turnover_id' => 'numeric',
             'status' => 'numeric',
         ]);
     }
