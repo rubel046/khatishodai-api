@@ -81,9 +81,8 @@ class UserController extends Controller
         } else {
             $companyBasic = 0;
         }
-
-        $profileCompletion = $personalInfo + $companyBasic + $companyDtls + $companyCertification + $companyFactoryDtls + $companyTrade;
-        $customerDetailsInfo = ['user' => $authUserData, 'profile_completion' => $profileCompletion];
+        $authUserData['profile_completion'] = $personalInfo + $companyBasic + $companyDtls + $companyCertification + $companyFactoryDtls + $companyTrade;
+        $customerDetailsInfo = ['user' => $authUserData];
         // return $this->showMessage($customerDetailsInfo);
         return response()->json($customerDetailsInfo, 200);
     }

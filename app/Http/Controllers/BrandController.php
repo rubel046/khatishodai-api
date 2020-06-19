@@ -84,9 +84,9 @@ class BrandController extends Controller
         $this->validate($request, [
             'name' => 'required|string',
             'code' => 'required|string|unique:brands,code' . ($id ? ', ' . $id : ''),
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:512',
-            'sort_order' => 'required|numeric',
-            'status' => 'required|numeric'
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg|max:512',
+            'sort_order' => 'numeric',
+            'status' => 'numeric'
         ]);
     }
 
