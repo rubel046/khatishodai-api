@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Traits\ApiResponse;
+use App\Traits\FileUpload;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use  App\User;
@@ -19,6 +20,7 @@ class UserController extends Controller
      * @return void
      */
     use ApiResponse;
+    use FileUpload;
     private $model;
 
     public function __construct(User $user)
@@ -114,7 +116,9 @@ class UserController extends Controller
         $address = $request->address;
         if (!empty($address)) auth()->user()->address()->updateOrCreate(['addressable_id' => auth()->id(), 'addressable_type' => User::class], $address);
         $data = $request->except('address');
-        $data['photo'] = $this->uploadImage($request);
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $this->saveImages($request, 'photo', 'users');
+        }
 
         $this->model->update($data, $id);
         return redirect()->to('account/profile');
@@ -160,7 +164,7 @@ class UserController extends Controller
             'last_name' => 'required|string',
             'job_title' => 'required|string',
             'email' => 'email|string',
-            'photo' => 'image|mimes:jpeg,png,jpg|max:512',
+            'photo' => $id? $request->hasFile('photo')? 'sometimes|image|mimes:jpeg,png,jpg|max:512':'string':'sometimes|image|mimes:jpeg,png,jpg|max:512',
             'address' => 'array',
         ]);
 
