@@ -10,7 +10,7 @@ trait FileUpload
      * Image upload trait used in controllers to upload files
      */
 
-    public static function saveImages(Request $request, $file, $folder)
+    protected function saveImages(Request $request, $file, $folder)
     {
         $file_ext = $request->file($file)->clientExtension();
         $file_name = uniqid() . '.' . $file_ext;
