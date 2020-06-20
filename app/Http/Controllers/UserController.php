@@ -163,7 +163,7 @@ class UserController extends Controller
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'job_title' => 'required|string',
-            'email' => 'email|string',
+            'email' => 'email|string|nullable',
             'photo' => $id? $request->hasFile('photo')? 'sometimes|image|mimes:jpeg,png,jpg|max:512':'string':'sometimes|image|mimes:jpeg,png,jpg|max:512',
             'address' => 'array',
         ]);
