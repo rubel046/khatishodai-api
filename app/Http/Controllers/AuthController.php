@@ -121,7 +121,8 @@ class AuthController extends Controller
                     'name' => $toName
                 ];
                 // Sending Mobile OTP
-                if ($this->sendPhoneCode($phone, 'greenweb')) {
+                $otp = rand(100000, 999999);
+                if ($this->sendPhoneCode($phone, $otp, 'greenweb')) {
                     return response()->json([
                         'user' => $data,
                         'signUpBy' => 'phone',
@@ -322,7 +323,7 @@ class AuthController extends Controller
             // greenweb sms
 
             $to = $phone ?? '01814111176';
-            $token = "82445cfa4e41f7df23807a144bbcdae6";
+            $token = "bbec12acef3b509fcf05ab5ff68fb861";
             $url = "http://api.greenweb.com.bd/api.php";
             $data = array(
                 'to' => $to,
@@ -335,8 +336,8 @@ class AuthController extends Controller
             curl_setopt($ch, CURLOPT_ENCODING, '');
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $smsResult = null;//curl_exec($ch);
-            $status = null;//explode(':', $smsResult)[0];
+            $smsResult = curl_exec($ch);
+            $status = explode(':', $smsResult)[0];
             if ($smsResult !== false) {
                 if ($status != 'Error') {
                     // save or update otp
