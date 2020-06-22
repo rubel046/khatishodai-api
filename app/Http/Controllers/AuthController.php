@@ -111,7 +111,7 @@ class AuthController extends Controller
                         'signUpBy' => 'email',
                         'message' => 'Registration form submitted successfully, Please check email ' . $email . ' to verify your account!'], 201);
                 } catch (\Exception $e) {
-                    return response()->json(['messages' => 'Registration form submitted successfully!, Email sending failed. Contact with admin'], 409);
+                    return response()->json(['messages' => 'Registration form submitted successfully! Email sending failed. Contact with admin'], 409);
                 }
 
             } else {
@@ -122,13 +122,14 @@ class AuthController extends Controller
                 ];
                 // Sending Mobile OTP
                 $otp = rand(100000, 999999);
-                if ($this->sendPhoneCode($phone, $otp, 'greenweb')) {
+                if ($this->sendPhoneCode($phone, $otp)) {
                     return response()->json([
                         'user' => $data,
                         'signUpBy' => 'phone',
                         'message' => 'Registration form submitted successfully. Please, Check your mobile ' . $phone . ' for verification OTP to verify'], 201);
                 } else {
-                    return response()->json(['messages' => 'Registration form submitted successfully!, Mobile OTP sending failed. Contact with admin'], 201);
+                    $user->delete();
+                    return response()->json(['messages' => 'Registration fail! Mobile OTP can not sent. Contact with admin'], 504);
                 }
             }
 
@@ -172,7 +173,7 @@ class AuthController extends Controller
             ];
         }
         if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
-            return response()->json(['errors' => ['message' => 'User Not Found | Unauthorized']], 404);
+            return response()->json(['errors' => ['message' => 'The username or password you entered is incorrect']], 404);
         }
 
         return $this->respondWithToken($token);
@@ -230,7 +231,7 @@ class AuthController extends Controller
 
     public function testOtp($phone)
     {
-        if ($this->checkOtpSent($phone) == 0) $this->sendPhoneCode($phone);
+        if ($this->checkOtpSent($phone) == 0) $this->sendPhoneCode($phone,'test-1234');
         // for check balance
         /*$post_url = 'https://portal.smsinbd.com/api/' ;
         $post_values = array(
@@ -314,12 +315,12 @@ class AuthController extends Controller
 
     }
 
-    private function sendPhoneCode($phone, $otp, $gateWay = 'smsbd')
+    public function sendPhoneCode($phone, $otp)
     {
         $sentStatus = false;
         $message = "Your tizaara mobile verification OTP code is " . $otp;
 
-        if ($gateWay == 'greenweb') {
+        if (ENV('SMS_GATEWAY') == 'greenweb') {
             // greenweb sms
 
             $to = $phone ?? '01814111176';
