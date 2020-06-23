@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Filters\CompanyFilter;
 use App\Model\CompanyCertificate;
+use App\Traits\FileUpload;
 use Illuminate\Http\Request;
 use App\Repositories\Repository;
 
 class CompanyCertificateController extends Controller
 {
+    use FileUpload;
     private $model;
 
     public function __construct(CompanyCertificate $companyCertificate, CompanyFilter $companyFilter)
@@ -28,7 +30,9 @@ class CompanyCertificateController extends Controller
         $this->validation($request);
 
         $data = $request->all();
-        $data['certificate_photo_name'] = $this->uploadImage($request);
+        if ($request->hasFile('certificate_photo_name')) {
+            $data['certificate_photo_name'] = $this->saveImages($request, 'certificate_photo_name', 'company_certificates');
+        }
 
         return $this->model->create($data);
     }
@@ -40,40 +44,16 @@ class CompanyCertificateController extends Controller
     }
 
 
-    public function search(Request $request)
-    {
-        $this->validate($request, ['searchStr' => 'required|string']);
-        try {
-            $searchItem = $request->searchStr;
-            $data = CompanyCertificate::query()
-                ->where('name', 'LIKE', "%{$searchItem}%")
-                ->orWhere('reference_number', 'LIKE', "%{$searchItem}%")
-                ->get();
-
-            if (!$data->isEmpty()) {
-                return response()->json(['datas' => $data, 'message' => DATA_FOUND], 200);
-            } else {
-                return response()->json(['datas' => $data, 'message' => NO_DATA], 404);
-            }
-
-
-        } catch (\Exception $e) {
-            $errMgs = $e->getMessage();
-            return response()->json(['message' => $errMgs], 500);
-        }
-
-    }
-
-
     public function update(Request $request, $id)
     {
         $this->validation($request, $id);
         $data = $request->all();
-        $data['certificate_photo_name'] = $this->uploadImage($request);
+        if ($request->hasFile('certificate_photo_name')) {
+            $data['certificate_photo_name'] = $this->saveImages($request, 'certificate_photo_name', 'company_certificates');
+        }
 
         return $this->model->update($data, $id);
     }
-
 
     public function destroy($id)
     {
@@ -89,23 +69,9 @@ class CompanyCertificateController extends Controller
             'issued_by' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'certificate_photo_name' => 'required|image|mimes:jpeg,png,jpg|max:512',
-            'status' => 'required|numeric',
+            'certificate_photo_name' => $id? $request->hasFile('certificate_photo_name')? 'sometimes|image|mimes:jpeg,png,jpg|max:512':'string':'sometimes|image|mimes:jpeg,png,jpg|max:512',
+            'status' => 'numeric',
         ]);
-    }
-
-    private function uploadImage(Request $request)
-    {
-        if ($request->hasFile('certificate_photo_name')) {
-            $file_ext = $request->file('certificate_photo_name')->clientExtension();
-            $destination_path = base_path('public/upload/company_certificates');
-            $image = uniqid() . '-' . time() . '.' . $file_ext;
-
-            if ($request->file('certificate_photo_name')->move($destination_path, $image)) {
-                return '/upload/company_certificates/' . $image;
-            }
-        }
-        return null;
     }
 
 }

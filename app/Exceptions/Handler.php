@@ -54,7 +54,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         if ($e instanceof ValidationException) {
-            return $this->errorResponse($e->validator->errors()->getMessages(), 400);
+            return $this->errorResponse($e->validator->errors()->getMessages(), 422);
         }
 
         if ($e instanceof AuthorizationException) {
@@ -69,7 +69,7 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof MethodNotAllowedHttpException) {
-            return $this->errorResponse('Method is not allowed for the requested route', $e->getCode());
+            return $this->errorResponse('Method is not allowed for the requested route', 400);
         }
 
         if ($e instanceof MethodNotAllowedHttpException) {
@@ -77,7 +77,7 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof HttpException) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+            return $this->errorResponse($e->getMessage(), 400);
         }
 
         if ($e instanceof ModelNotFoundException) {
@@ -85,7 +85,7 @@ class Handler extends ExceptionHandler
             return $this->errorResponse("Does not exist {$modelName} method with the specific Identification", 404);
         }
         if($e instanceof QueryException){
-                return $this->errorResponse($e->getMessage(),$e->getCode());
+                return $this->errorResponse($e->getMessage(),400);
         }
 
         return parent::render($request, $e);

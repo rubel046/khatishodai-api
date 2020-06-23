@@ -34,10 +34,5 @@ class DatabaseSeeder extends Seeder
         $this->call('CompanyPhotoTableSeeder');
         $this->call('CompanyTradeMembershipTableSeeder');
         $this->call('WebUserSeeder');
-        $this->call('ExportPercentageBreakdownSeeder');
-        $this->call('QcStaffBreakdowns');
-        $this->call('RndStaffBreakdownSeeder');
-        $this->call('RevenueBreakdownsSeeder');
-        $this->call('TurnoverBreakdownsSeeder');
     }
 }

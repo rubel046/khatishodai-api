@@ -19,7 +19,7 @@ trait ApiResponse
             return $this->apiResponse(['result' => $collection], $code);
         }
 
-        return response('', 204);
+        return response('',204)->setStatusCode(204, 'No data exists');
     }
 
     protected function pagination($data, $code = 200)

@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\FileUpload;
 use App\Filters\CompanyFilter;
 use App\Model\CompanyDetail;
 use App\Repositories\Repository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use App\Model\Company;
+
 
 class CompanyDetailsController extends Controller
 {
+    use ApiResponse;
+    use FileUpload;
+
     private $model;
 
     public function __construct(CompanyDetail $model, CompanyFilter $companyFilter)
@@ -28,7 +35,9 @@ class CompanyDetailsController extends Controller
         $this->validation($request);
 
         $data = $request->all();
-        $data['logo'] = $this->uploadImage($request);
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $this->saveImages($request, 'logo', 'company_details');
+        }
 
         return $this->model->create($data);
     }
@@ -39,29 +48,9 @@ class CompanyDetailsController extends Controller
         return $this->model->show($id);
     }
 
-
-    public function search(Request $request)
+    public function detailsByCompany($company_id)
     {
-        $this->validate($request,['searchStr'=>'required|string']);
-        try {
-            $searchItem = $request->searchStr;
-            $data = CompanyDetail::query()
-                ->where('company_id', 'LIKE', "%{$searchItem}%")
-                ->orWhere('about_us', 'LIKE', "%{$searchItem}%")
-                ->get();
-                
-            if(!$data->isEmpty()){
-                return response()->json(['datas' => $data,'message' => DATA_FOUND], 200);
-            }else{
-                return response()->json(['datas' => $data,'message' => NO_DATA], 404);
-            }
-
-
-        } catch (\Exception $e) {
-            $errMgs = $e->getMessage();
-            return response()->json(['message' => $errMgs], 500);
-        }
-
+        return $this->showOne(CompanyDetail::whereCompanyId($company_id)->first());
     }
 
 
@@ -69,9 +58,29 @@ class CompanyDetailsController extends Controller
     {
         $this->validation($request, $id);
         $data = $request->all();
-        $data['logo'] = $this->uploadImage($request);
-
+        if ($request->hasFile('logo')) {
+            $image = $this->saveImages($request, 'logo', 'company_details');
+            $data['logo'] = $image;
+        }
         return $this->model->update($data, $id);
+    }
+
+    public function companyDetailsCreateOrUpdate(Request $request, Company $company)
+    {
+        $this->validation($request,true);
+        try {
+            $company = $company->findOrFail($request->company_id);
+            $data = $request->all();
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $this->saveImages($request, 'logo', 'company_details');
+            }
+
+            $details = $company->CompanyDetail()->updateOrCreate(['company_id' => $request->company_id], $data);
+            return $this->updatedSuccess($details);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+
     }
 
 
@@ -84,28 +93,13 @@ class CompanyDetailsController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|numeric',
-            'logo' => 'sometimes|image|mimes:jpeg,png,jpg|max:512',
+            'logo' => $id? $request->hasFile('logo')? 'sometimes|image|mimes:jpeg,png,jpg|max:512':'string':'sometimes|image|mimes:jpeg,png,jpg|max:512',
             'about_us' => 'required|string',
             'mission' => 'required|string',
-            'vision' => 'required|string',
-            'youtube_link' => 'required|string',
-            'fb_link' => 'required|string',
-            'status' =>  'required|numeric',
+            'vision' => 'string',
+            'youtube_link' => 'string',
+            'fb_link' => 'string',
         ]);
-    }
-
-    private function uploadImage(Request $request)
-    {
-        if ($request->hasFile('logo')) {
-            $file_ext = $request->file('logo')->clientExtension();
-            $destination_path = base_path('public/upload/company_details');
-            $image = uniqid() . '-' . time() . '.' . $file_ext;
-
-            if ($request->file('logo')->move($destination_path, $image)) {
-                return '/upload/company_details/' . $image;
-            }
-        }
-        return null;
     }
 
 }

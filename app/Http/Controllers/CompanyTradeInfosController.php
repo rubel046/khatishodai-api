@@ -78,7 +78,6 @@ class CompanyTradeInfosController extends Controller
             'company_id' => 'required|numeric',
             'annual_revenue_id' => 'required|numeric',
             'export_percent_id' => 'required|numeric',
-            'status' => 'required|numeric'
         ]);
     }
 

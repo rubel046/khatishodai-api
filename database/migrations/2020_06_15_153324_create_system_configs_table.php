@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Helper\CustomBlueprint;
 
-class CreateCompaniesTable extends Migration
+class CreateSystemConfigsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -19,14 +19,12 @@ class CreateCompaniesTable extends Migration
             return new CustomBlueprint($table, $callback);
         });
 
-        $schema->create('companies', function (CustomBlueprint $table) {
+        $schema->create('system_configs', function (CustomBlueprint $table) {
             $table->id();
             $table->string('name',150);
-            $table->string('web_url',150)->nullable();
-            $table->integer('business_type_id')->nullable();
-            $table->mediumText('address')->nullable();
-            $table->string('email',150)->nullable();
-            $table->string('phone_number',150)->nullable();
+            $table->string('alias',100)->unique();
+            $table->string('purpose',150)->nullable();
+            $table->longText('data');
             $table->commonFields();
         });
     }
@@ -38,6 +36,6 @@ class CreateCompaniesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('system_configs');
     }
 }

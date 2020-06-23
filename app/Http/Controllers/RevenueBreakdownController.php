@@ -52,7 +52,6 @@ class RevenueBreakdownController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'status' => 'numeric',
         ]);
     }
 

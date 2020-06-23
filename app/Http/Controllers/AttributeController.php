@@ -18,7 +18,7 @@ class AttributeController extends Controller
 
     public function index()
     {
-        return $this->model->paginate();
+        return $this->model->all();
     }
 
 
@@ -74,9 +74,8 @@ class AttributeController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|unique:attributes,name' . ($id ? ', ' . $id : ''),
-            'slug' => 'string',
-            'type' => 'in:color,image,label',
-            'status' => 'numeric',
+            'slug' => 'string|unique:attributes,slug' . ($id ? ', ' . $id : ''),
+            'type' => 'string|nullable',
         ]);
     }
 }

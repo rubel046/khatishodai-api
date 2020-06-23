@@ -2,23 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\QcStaffBreakdown;
+use App\Model\SystemConfig;
 use App\Repositories\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
-class QcStaffBreakdownController extends Controller
+class SystemConfigController extends Controller
 {
     private $model;
 
-    public function __construct(QcStaffBreakdown $model)
+    public function __construct(SystemConfig $model)
     {
-        $this->middleware('auth');
+        //$this->middleware('auth');
         $this->model = new Repository($model);
     }
 
     public function index()
     {
-        return $this->model->paginate();
+        return Cache::rememberForever('system_config', function () {
+            return $this->model->all();
+        });
     }
 
 
@@ -27,7 +30,6 @@ class QcStaffBreakdownController extends Controller
         $this->validation($request);
         return $this->model->create($request->all());
     }
-
 
 
     public function show($id)
@@ -52,6 +54,10 @@ class QcStaffBreakdownController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
+            'alias' => 'required|string|unique:system_configs,alias' . ($id ? ', ' . $id : ''),
+            'purpose' => 'sometimes|string',
+            'data' => 'required|string',
+            'status' => 'numeric',
         ]);
     }
 

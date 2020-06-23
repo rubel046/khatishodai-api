@@ -77,7 +77,7 @@ class CompanyNearestPortsController extends Controller
         $this->validate($request, [
             'company_id' => 'required|numeric',
             'name' => 'required|string',
-            'status' => 'required|numeric',
+            'status' => 'numeric',
         ]);
     }
 
