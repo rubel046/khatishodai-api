@@ -33,7 +33,7 @@ class AuthController extends Controller
             'phone' => 'unique:users',*/
             'userType' => 'required|numeric',
             'country' => 'required|numeric',
-            'companyName' => 'required|string',
+            /*'companyName' => 'required|string',*/
         ]);
 
         if ($validator->fails()) {
@@ -79,13 +79,15 @@ class AuthController extends Controller
             $user->is_verified = 0;
             $user->save();
 
-            // Insert Company Name
-            $companyData = new Company();
-            $companyData->user_id = $user->id;
-            $companyData->name = $request->input('companyName');
-            $companyData->ip_address = $request->ip();
-            $companyData->created_by = $user->id;
-            $companyData->save();
+            if ($request->companyName) {
+                // Insert Company Name
+                $companyData = new Company();
+                $companyData->user_id = $user->id;
+                $companyData->name = $request->input('companyName');
+                $companyData->ip_address = $request->ip();
+                $companyData->created_by = $user->id;
+                $companyData->save();
+            }
 
             $toName = $user->first_name . ' ' . $user->last_name;
 
@@ -133,6 +135,7 @@ class AuthController extends Controller
             }
 
         } catch (\Exception $e) {
+            return response()->json(['messages' => $e->getMessage()], 409);
             return response()->json(['messages' => 'User Registration Failed!'], 409);
         }
 
