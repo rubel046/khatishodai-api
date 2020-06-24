@@ -98,7 +98,7 @@ class CompanyController extends Controller
         $this->validate($request, [
             'name' => 'required|string',
             'website' => 'string|unique:company_basic_infos,website' . ($id ? ', ' . $id : ''),
-            'display_name' => 'required|string',
+            /*'display_name' => 'required|string',*/
             'establishment_date' => 'required|date',
             'office_space' => 'string',
             'email' => 'required|email',
@@ -107,7 +107,7 @@ class CompanyController extends Controller
             'fax' => 'string',
             'number_of_employee' => 'required|numeric',
             'ownership_type' => 'required|numeric',
-            'turnover_id' => 'numeric',
+            /*'turnover_id' => 'numeric',*/
             'status' => 'numeric',
         ]);
     }
