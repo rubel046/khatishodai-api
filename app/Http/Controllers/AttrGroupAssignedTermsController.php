@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Model\AttributeGroupAssignedTerm;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Repositories\Repository;
 
 class AttrGroupAssignedTermsController extends Controller
 {
+    use ApiResponse;
     private $model;
 
     public function __construct(AttributeGroupAssignedTerm $attributeTerms)
@@ -25,7 +27,24 @@ class AttrGroupAssignedTermsController extends Controller
     public function store(Request $request)
     {
         $this->validation($request);
-        return $this->model->create($request->all());
+        $productsData = [];
+        $attributeIds = is_array($request->attribute_id) ? array_filter($request->attribute_id) : [];
+        if (!empty($attributeIds)) {
+            foreach ($attributeIds as $key => $value) {
+                $productsData[] = [
+                    'attribute_group_id' => $request->attribute_group_id,
+                    'attribute_id' => $value,
+                    'attribute_term_ids' => $request->attribute_term_ids[$key],
+                    'is_variation_maker' => $request->is_variation_maker,
+                    'status' => $request->status,
+                    'created_by' => auth()->id(),
+                    'ip_address' => request()->ip()
+                ];
+            }
+        }
+
+        AttributeGroupAssignedTerm::insert($productsData);
+        return $this->createdSuccess($request->all());
     }
 
 
@@ -60,7 +79,7 @@ class AttrGroupAssignedTermsController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validation($request, $id);
+        $this->validationUpdate($request, $id);
         return $this->model->update($request->all(), $id);
     }
 
@@ -74,9 +93,21 @@ class AttrGroupAssignedTermsController extends Controller
     {
         $this->validate($request, [
             'attribute_group_id' => 'required|numeric',
+            'attribute_id' => 'required|array|min:1',
+            'attribute_id.*' => 'required|numeric',
+            'attribute_term_ids' => 'required|array|min:1',
+            'attribute_term_ids.*' => 'required|string',
+            'is_variation_maker' => 'required|boolean',
+            'status' => 'numeric|nullable',
+        ]);
+    }
+
+    private function validationUpdate(Request $request, $id = false)
+    {
+        $this->validate($request, [
+            'attribute_group_id' => 'required|numeric',
             'attribute_id' => 'required|numeric',
             'attribute_term_ids' => 'required|string',
-            'is_visible_on_product' => 'boolean',
             'is_variation_maker' => 'boolean',
             'status' => 'numeric',
         ]);
