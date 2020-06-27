@@ -22,6 +22,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /*protected $guarded = [];*/
     protected $fillable = [
         'account_type',
+        'membership_plan',
+        'parent_id',
         'userName',
         'first_name',
         'last_name',
@@ -29,9 +31,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'job_title',
         'email',
         'phone',
-        'telephone'
+        'telephone',
+        'is_verified',
+        'verificationToken',
+        'is_admin',
+        'status',
+        'created_by',
+        'ip_address',
     ];
-
 
 
     /**
