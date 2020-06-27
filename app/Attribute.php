@@ -11,6 +11,9 @@ class Attribute extends Model
     protected $fillable = [
         'name',  'display_name', 'slug','type','status', 'ip_address','created_by', 'updated_by'
     ];
+    protected $hidden = [
+        'created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'
+    ];
 
     public function attributeGroup()
     {
