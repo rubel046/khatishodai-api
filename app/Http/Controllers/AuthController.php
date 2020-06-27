@@ -175,7 +175,7 @@ class AuthController extends Controller
             ];
         }
         if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
-            return response()->json(['errors' => ['message' => 'User Not Found | Unauthorized']], 404);
+            return response()->json(['errors' => ['message' => 'You enter user name password is invalid']], 404);
         }
 
         return $this->respondWithToken($token);
