@@ -75,7 +75,8 @@ class AttributeTermsController extends Controller
         $this->validate($request, [
             'name' => 'required|string',
             'attribute_id' => 'required|numeric',
-            'status' => 'numeric',
+            'is_visible_on_product' => 'boolean|nullable',
+            'status' => 'numeric|nullable',
         ]);
     }
 }
