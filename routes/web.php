@@ -40,6 +40,7 @@ $router->get('config', 'ConfigController@index');
 resource('menu_operations', 'MenuOperationController');
 resource('btype', 'BusinessTypeController');
 resource('brand', 'BrandController');
+resource('category/list', 'CategoryController@allList');
 resource('category', 'CategoryController');
 resource('product/attribute', 'AttributeController');
 resource('product/attribute_terms', 'AttributeTermsController');
