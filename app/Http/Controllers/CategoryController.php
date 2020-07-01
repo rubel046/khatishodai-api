@@ -7,6 +7,7 @@ use App\Repositories\Repository;
 use App\Traits\ApiResponse;
 use App\Traits\FileUpload;
 use Illuminate\Http\Request;
+use DB;
 
 class CategoryController extends Controller
 {
@@ -24,6 +25,11 @@ class CategoryController extends Controller
     public function index()
     {
         return $this->showAll(Category::whereNull('parent_id')->get());
+    }
+
+    public function allList()
+    {
+        return $this->showAll(DB::table('categories')->get());
     }
 
 
@@ -65,10 +71,10 @@ class CategoryController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|unique:categories,name' . ($id ? ', ' . $id : ''),
-            'parent_id' => 'numeric',
-            'description' => 'string',
-            'image' => $id? $request->hasFile('image')? 'sometimes|image|mimes:jpeg,png,jpg|max:512':'string':'sometimes|image|mimes:jpeg,png,jpg|max:512',
-            'rank' => 'required|numeric'
+            'parent_id' => 'numeric|nullable',
+            'description' => 'string|nullable',
+            'image' => $id? $request->hasFile('image')? 'image|mimes:jpeg,png,jpg|max:512':'string':'nullable|image|mimes:jpeg,png,jpg|max:512',
+            'rank' => 'required|numeric|nullable'
         ]);
     }
 

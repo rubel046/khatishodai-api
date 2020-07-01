@@ -15,7 +15,12 @@ class Attribute extends Model
         'created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'
     ];
 
-    public function attributeGroup()
+    public function attributeGroupAssignedTerm()
+    {
+        return $this->hasMany('App\Model\AttributeGroupAssignedTerm');
+    }
+
+    public function attributeTerms()
     {
         return $this->hasMany('App\Model\AttributeTerm');
     }
