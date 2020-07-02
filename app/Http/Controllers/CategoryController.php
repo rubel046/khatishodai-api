@@ -24,12 +24,12 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return $this->showAll(Category::whereNull('parent_id')->get());
+        return $this->showAll(Category::orderBy('rank', 'asc')->whereNull('parent_id')->get());
     }
 
     public function allList()
     {
-        return $this->showAll(DB::table('categories')->get());
+        return $this->showAll(DB::table('categories')->orderBy('rank', 'asc')->get());
     }
 
 
