@@ -29,7 +29,9 @@ class CategoryController extends Controller
 
     public function allList()
     {
-        return $this->showAll(DB::table('categories')->orderBy('rank', 'asc')->get());
+        return $this->showAll(DB::table('categories')
+            ->whereNull('deleted_at')
+            ->orderBy('rank', 'asc')->get());
     }
 
 
