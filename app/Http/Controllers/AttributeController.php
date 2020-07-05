@@ -75,7 +75,7 @@ class AttributeController extends Controller
         $this->validate($request, [
             'name' => 'required|string|unique:attributes,name' . ($id ? ', ' . $id : ''),
             'display_name' => 'string|nullable',
-            'slug' => 'string|unique:attributes,slug' . ($id ? ', ' . $id : ''),
+            'slug' => 'nullable|string|unique:attributes,slug' . ($id ? ', ' . $id : ''),
             'type' => 'string|nullable',
             'is_filter_criteria' => 'boolean|nullable',
         ]);
