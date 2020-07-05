@@ -9,7 +9,7 @@ class Attribute extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',  'display_name', 'slug','type','status', 'ip_address','created_by', 'updated_by'
+        'name',  'display_name', 'slug','type','is_filter_criteria','status', 'ip_address','created_by', 'updated_by'
     ];
     protected $hidden = [
         'created_by', 'updated_by', 'deleted_at', 'created_at', 'updated_at', 'ip_address'

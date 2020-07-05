@@ -77,6 +77,7 @@ class AttributeController extends Controller
             'display_name' => 'string|nullable',
             'slug' => 'string|unique:attributes,slug' . ($id ? ', ' . $id : ''),
             'type' => 'string|nullable',
+            'is_filter_criteria' => 'boolean|nullable',
         ]);
     }
 }
