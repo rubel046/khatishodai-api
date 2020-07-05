@@ -75,7 +75,7 @@ class CategoryController extends Controller
             'name' => 'required|string|unique:categories,name' . ($id ? ', ' . $id : ''),
             'parent_id' => 'numeric|nullable',
             'description' => 'string|nullable',
-            'image' => $id? $request->hasFile('image')? 'image|mimes:jpeg,png,jpg|max:512':'string':'nullable|image|mimes:jpeg,png,jpg|max:512',
+            'image' =>  $request->hasFile('image')? 'image|mimes:jpeg,png,jpg|max:512':'nullable',
             'rank' => 'required|numeric|nullable'
         ]);
     }
