@@ -24,7 +24,8 @@ class PasswordController extends Controller
         $authController = new AuthController;
         $userName= $authController->findLoginWith($request->emailOrPhone);
 
-        $user = User::where(['userName'=> $request->emailOrPhone])->first();
+        $user = User::where('userName', $request->emailOrPhone)
+            ->orWhere('phone',$request->emailOrPhone)->first();
         if($userName=='email'){
             $validator = Validator::make($request->all(), [
                 'emailOrPhone' => 'email|required',
