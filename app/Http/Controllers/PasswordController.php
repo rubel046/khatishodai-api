@@ -65,7 +65,7 @@ class PasswordController extends Controller
                             'userName' => $request->emailOrPhone,
                             'status' => 'success',
                             'signUpBy' => 'email',
-                            'message' => 'Your login reset code has been sent to your email '.$email.', Please check your '.$userName.'!'], 201);
+                            'message' => 'Your login reset code has been sent to your email '.$email.', Please check your '.$userName.' to complete the change'], 200);
                     }else{
                         return response()->json([
                             'userId' => $user->id,
@@ -158,7 +158,7 @@ class PasswordController extends Controller
                         'userName' => $phone,
                         'status' => 'success',
                         'signUpBy' => 'phone',
-                        'message' => 'Your login reset code has been sent to your mobile number '.$phone.', Please check your phone!'], 201);
+                        'message' => 'Your login reset code has been sent to your mobile number '.$phone.', Please check your phone for OTP'], 200);
                 }catch (\Exception $e){
                     return response()->json([
                         'userId' => $user->id,
@@ -263,7 +263,5 @@ class PasswordController extends Controller
 
         }
     }
-
-
 
 }
