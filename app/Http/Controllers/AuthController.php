@@ -124,7 +124,7 @@ class AuthController extends Controller
                 ];
                 // Sending Mobile OTP
                 $otp = rand(100000, 999999);
-                if ($this->sendPhoneCode($phone, $otp, 'greenweb')) {
+                if ($this->sendPhoneCode($phone, $otp)) {
                     return response()->json([
                         'user' => $data,
                         'signUpBy' => 'phone',
@@ -233,7 +233,7 @@ class AuthController extends Controller
 
     public function testOtp($phone)
     {
-        if ($this->checkOtpSent($phone) == 0) $this->sendPhoneCode($phone);
+         $this->sendPhoneCode($phone,'test-code');
         // for check balance
         /*$post_url = 'https://portal.smsinbd.com/api/' ;
         $post_values = array(
@@ -317,8 +317,10 @@ class AuthController extends Controller
 
     }
 
-    private function sendPhoneCode($phone, $otp, $gateWay = 'smsbd')
+    public function sendPhoneCode($phone, $otp, $gateWay = null)
     {
+        $gateWay = $gateWay ?? ENV('SMS_GATEWAY');
+       // echo $gateWay; die();
         $sentStatus = false;
         $message = "Your tizaara mobile verification OTP code is " . $otp;
 
@@ -326,7 +328,7 @@ class AuthController extends Controller
             // greenweb sms
 
             $to = $phone ?? '01814111176';
-            $token = "bbec12acef3b509fcf05ab5ff68fb861";
+            $token = ENV('GREEN_WEB_SMS_TOKEN');
             $url = "http://api.greenweb.com.bd/api.php";
             $data = array(
                 'to' => $to,
@@ -360,10 +362,10 @@ class AuthController extends Controller
             //https://portal.smsinbd.com/smsapi?api_key=b1af6725e5e788d3e3096803f5953ef913c56873&type=text&contacts=8801814111176&senderid=8801552146120&msg=test&method=api
             $post_url = 'https://portal.smsinbd.com/smsapi/';
             $post_values = array(
-                'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
+                'api_key' => ENV('SMS_BD_API_KEY'),// 'b1af6725e5e788d3e3096803f5953ef913c56873',
                 'type' => 'text',  // unicode or text
                 'contacts' => $phone ?? '8801814111176',
-                'senderid' => '8801552146120',
+                'senderid' => ENV('SMS_BD_SENDER_ID'), //'8801844502926',
                 'msg' => 'test',
                 'method' => 'api'
             );
@@ -384,6 +386,7 @@ class AuthController extends Controller
             $post_response = curl_exec($request);
             curl_close($request);
             $responses = array();
+            dd($post_response);
             $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
 
             if ($array) {
@@ -396,7 +399,7 @@ class AuthController extends Controller
             }
             // end sms in bd
         }
-
+dd($sentStatus);
         return $sentStatus;
 
     }
