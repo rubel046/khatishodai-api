@@ -188,7 +188,7 @@ class PasswordController extends Controller
             return response()->json([
                 'user' => $user->userName,
                 'status' => 'failed',
-                'message' => 'You enter or phone is invalid user not found'
+                'message' => 'You enter email or phone is invalid, user not found'
             ], 402);
         } else {
             if($user->verificationToken!=$request->verificationToken){
