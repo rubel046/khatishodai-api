@@ -233,7 +233,7 @@ class AuthController extends Controller
 
     public function testOtp($phone)
     {
-         $this->sendPhoneCode($phone,'test-code');
+        $this->sendPhoneCode($phone, 'test-code');
         // for check balance
         /*$post_url = 'https://portal.smsinbd.com/api/' ;
         $post_values = array(
@@ -320,86 +320,114 @@ class AuthController extends Controller
     public function sendPhoneCode($phone, $otp, $gateWay = null)
     {
         $gateWay = $gateWay ?? ENV('SMS_GATEWAY');
-       // echo $gateWay; die();
+        // echo $gateWay; die();
         $sentStatus = false;
-        $message = "Your tizaara mobile verification OTP code is " . $otp;
 
-        if ($gateWay == 'greenweb') {
-            // greenweb sms
+        $users = User::wherePhone($phone)->first();
+        if (!empty($users)) {
 
-            $to = $phone ?? '01814111176';
-            $token = ENV('GREEN_WEB_SMS_TOKEN');
-            $url = "http://api.greenweb.com.bd/api.php";
-            $data = array(
-                'to' => $to,
-                'message' => $message,
-                'token' => $token
-            );
-            // Add parameters in key value
-            $ch = curl_init(); // Initialize cURL
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_ENCODING, '');
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $smsResult = curl_exec($ch);
-            $status = explode(':', $smsResult)[0];
-            if ($smsResult !== false) {
-                if ($status != 'Error') {
-                    // save or update otp
-                    User::updateOrCreate(
-                        ['phone' => $phone],
-                        ['verificationToken' => $otp]
-                    );
-                    $sentStatus = true;
-                } else {
-                    // Invalid Mobile Number
-                }
-            } else {
-                // Problem with connection
-            }
-        } else {
-            // sms in bd api
-            //https://portal.smsinbd.com/smsapi?api_key=b1af6725e5e788d3e3096803f5953ef913c56873&type=text&contacts=8801814111176&senderid=8801552146120&msg=test&method=api
-            $post_url = 'https://portal.smsinbd.com/smsapi/';
-            $post_values = array(
-                'api_key' => ENV('SMS_BD_API_KEY'),// 'b1af6725e5e788d3e3096803f5953ef913c56873',
-                'type' => 'text',  // unicode or text
-                'contacts' => $phone ?? '8801814111176',
-                'senderid' => ENV('SMS_BD_SENDER_ID'), //'8801844502926',
-                'msg' => 'test',
-                'method' => 'api'
-            );
+            $users->verificationToken = $otp;
+            $users->save();
 
-            $post_string = "";
-            foreach ($post_values as $key => $value) {
-                $post_string .= "$key=" . urlencode($value) . "&";
-            }
-            $post_string = rtrim($post_string, "& ");
-            $request = curl_init();
-            curl_setopt($request, CURLOPT_URL, $post_url);
-            curl_setopt($request, CURLOPT_ENCODING, '');
-            curl_setopt($request, CURLOPT_HEADER, 0);
-            curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
-            //curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
-            curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query($post_values));
-            curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
-            $post_response = curl_exec($request);
-            curl_close($request);
-            $responses = array();
-            dd($post_response);
-            $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
-
-            if ($array) {
-                // save or update otp
-                User::updateOrCreate(
-                    ['phone' => $phone],
-                    ['verificationToken' => $otp]
+            $message = "Your tizaara mobile verification OTP code is " . $otp;
+            if ($gateWay == 'greenweb') {
+                // greenweb sms
+                $to = $phone ?? '01814111176';
+                $token = ENV('GREEN_WEB_SMS_TOKEN');
+                $url = "http://api.greenweb.com.bd/api.php";
+                $data = array(
+                    'to' => $to,
+                    'message' => $message,
+                    'token' => $token
                 );
-                $sentStatus = true;
+                // Add parameters in key value
+                $ch = curl_init(); // Initialize cURL
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_ENCODING, '');
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $smsResult = curl_exec($ch);
+                $status = explode(':', $smsResult)[0];
+                if ($smsResult !== false) {
+                    if ($status != 'Error') {
+                        $sentStatus = true;
+                    } else {
+                        // Invalid Mobile Number
+                    }
+                } else {
+                    // Problem with connection
+                }
+            } else if ($gateWay == 'smsbd') {
+                // sms in bd
+                //https://portal.smsinbd.com/smsapi?api_key=b1af6725e5e788d3e3096803f5953ef913c56873&type=text&contacts=8801814111176&senderid=8801552146120&msg=test&method=api
+                $post_url = 'https://portal.smsinbd.com/smsapi';
+                $post_values = array(
+                    'api_key' => ENV('SMS_BD_API_KEY'),// 'b1af6725e5e788d3e3096803f5953ef913c56873',
+                    'type' => 'text',  // unicode or text
+                    'contacts' => $phone ?? '8801814111176',
+                    'senderid' => ENV('SMS_BD_SENDER_ID'), //'8801844502926',
+                    'msg' => $message,
+                    'method' => 'api'
+                );
+
+                $post_string = "";
+                foreach ($post_values as $key => $value) {
+                    $post_string .= "$key=" . urlencode($value) . "&";
+                }
+                $post_string = rtrim($post_string, "& ");
+                // echo $post_string; die();
+                $request = curl_init();
+                curl_setopt($request, CURLOPT_URL, $post_url);
+                curl_setopt($request, CURLOPT_ENCODING, '');
+                curl_setopt($request, CURLOPT_HEADER, 0);
+                curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
+                curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query($post_values));
+                curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
+                $post_response = curl_exec($request);
+                curl_close($request);
+                $responses = array();
+                $array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true);
+
+                if ($array) {
+                    $sentStatus = true;
+                }
+            } else if ($gateWay == 'mobireach') {
+                // MOBIREACH SMS
+                //https://api.mobireach.com.bd/SendTextMessage?Username=tizaara&Password=dhaka@123&From=8801844502926&To=8801814111176&Message=testmessage%20shamim
+                $post_url = 'https://api.mobireach.com.bd/SendTextMessage';
+                $post_values = array(
+                    'Username' => ENV('MOBIREACH_USER'),
+                    'Password' => ENV('MOBIREACH_PASS'),
+                    'From' => ENV('MOBIREACH_FROM'),
+                    'To' => $phone ?? '8801814111176',
+                    'Message' => $message
+                );
+
+                $post_string = "";
+                foreach ($post_values as $key => $value) {
+                    $post_string .= "$key=" . urlencode($value) . "&";
+                }
+                $post_string = rtrim($post_string, "& ");
+                $request = curl_init();
+                curl_setopt($request, CURLOPT_URL, $post_url);
+                curl_setopt($request, CURLOPT_ENCODING, '');
+                curl_setopt($request, CURLOPT_HEADER, 0);
+                curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
+                curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query($post_values));
+                curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
+                $response = curl_exec($request);
+                curl_close($request);
+                $resObj = simplexml_load_string($response);
+               // $resJson = json_encode($resObj);
+                //$resArr = json_decode($resJson, true);
+
+                if ($resObj->ServiceClass->StatusText == 'success') {
+                    $sentStatus = true;
+                }
             }
-            // end sms in bd
         }
-dd($sentStatus);
         return $sentStatus;
 
     }

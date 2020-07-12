@@ -25,7 +25,8 @@ class PasswordController extends Controller
         $userName= $authController->findLoginWith($request->emailOrPhone);
 
         $user = User::where('userName', $request->emailOrPhone)
-            ->orWhere('phone',$request->emailOrPhone)->first();
+            ->orWhere('phone',$request->emailOrPhone)
+            ->orWhere('email',$request->emailOrPhone)->first();
         if($userName=='email'){
             $validator = Validator::make($request->all(), [
                 'emailOrPhone' => 'email|required',
@@ -176,7 +177,7 @@ class PasswordController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'errors'=>$validator->errors(),
-                'message'=>'Operation Failed'
+                'message'=>'Operation Failed, check input correctly'
             ], 422);
         }
 
@@ -199,6 +200,8 @@ class PasswordController extends Controller
 
             $user->password = app('hash')->make($request->password);
             $user->verificationToken = null;
+            $user->is_verified = 1;
+            $user->status = 1;
             $user->save();
 
             $authController= new AuthController();
