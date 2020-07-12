@@ -118,40 +118,7 @@ class PasswordController extends Controller
                 try{
                     // Sending Mobile OTP
                     if($authController->checkOtpSent($phone)==0){
-                        //$otp = mt_rand(100000, 999999);
-                        $message = "Your tizaara mobile verification OTP code is ".$verify_token;
-                        $post_url = 'https://portal.smsinbd.com/smsapi/' ;
-                        $post_values = array(
-                            'api_key' => 'b1af6725e5e788d3e3096803f5953ef913c56873',
-                            'type' => 'text',  // unicode or text
-                            'senderid' => '8801552146120',
-                            'contacts' => '88'.$phone,
-                            'msg' => $message,
-                            'method' => 'api'
-                        );
-
-                        $post_string = "";
-                        foreach( $post_values as $key => $value )
-                        { $post_string .= "$key=" . urlencode( $value ) . "&"; }
-                        $post_string = rtrim( $post_string, "& " );
-
-
-                        $request = curl_init($post_url);
-                        curl_setopt($request, CURLOPT_HEADER, 0);
-                        curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
-                        curl_setopt($request, CURLOPT_POSTFIELDS, $post_string);
-                        curl_setopt($request, CURLOPT_SSL_VERIFYPEER, FALSE);
-                        $post_response = curl_exec($request);
-                        curl_close ($request);
-
-                        $responses=array();
-                        $array =  json_decode( preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $post_response), true );
-
-                        /* if($array){
-                             echo $array['status'] ;
-                             echo $array['CamID'] ;
-                             dd($array);
-                         }*/
+                       $results= $authController->sendPhoneCode($phone,$verify_token);
                     }
                     return response()->json([
                         'userId' => $user->id,
@@ -221,13 +188,13 @@ class PasswordController extends Controller
             return response()->json([
                 'user' => $user->userName,
                 'status' => 'failed',
-                'message' => 'Invalid Request Or user not found'
+                'message' => 'You enter email or phone is invalid, user not found'
             ], 402);
         } else {
             if($user->verificationToken!=$request->verificationToken){
                 return response()->json([
-                    'message' => 'Invalid code Or Expired',
-                    'errors'=>['verificationToken'=>'Invalid code Or Expired']], 422);
+                    'message' => 'Invalid OTP code Or it has Expired!',
+                    'errors'=>['verificationToken'=>['Invalid code Or Expired']]], 422);
             }
 
             $user->password = app('hash')->make($request->password);
