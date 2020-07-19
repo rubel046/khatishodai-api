@@ -12,6 +12,7 @@
 
 $router->get('/', function () use ($router) {
     // return $router->app->version();
+    Cache::flush();
     return "Welcome To Tizaara API";
 });
 

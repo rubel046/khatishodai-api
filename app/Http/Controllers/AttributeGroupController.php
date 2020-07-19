@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AttributeGroup;
 use Illuminate\Http\Request;
-use App\Repositories\Repository;
-
+use Illuminate\Support\Facades\Auth;
 
 class AttributeGroupController extends Controller
 {
@@ -13,8 +12,8 @@ class AttributeGroupController extends Controller
 
     public function __construct(AttributeGroup $attributeGroup)
     {
-        $this->middleware('auth');
-        $this->model = new Repository($attributeGroup);
+        // $this->middleware('auth');
+        // $this->model = new Repository($attributeGroup);
     }
 
     public function index()
@@ -25,8 +24,17 @@ class AttributeGroupController extends Controller
 
     public function store(Request $request)
     {
-        $this->validation($request);
-        return $this->model->create($request->all());
+        // $this->validation($request);
+        $input = $request->all();
+        $data = new AttributeGroup;
+        // dd($input["name"][0]);
+        for($i=0; $i<=count($input["name"]); $i++){
+            $data->name = $input["name"][$i];
+            $data->created_by = Auth::id();
+            $data->ip_address = request()->ip();
+            $data->save();
+        // dd($data);
+        }
     }
 
 
@@ -78,4 +86,5 @@ class AttributeGroupController extends Controller
             'status' => 'numeric'
         ]);
     }
+
 }
