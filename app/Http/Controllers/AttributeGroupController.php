@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AttributeGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Model\AttributeGroupAssignedTerm;
 
 class AttributeGroupController extends Controller
 {
@@ -26,15 +27,20 @@ class AttributeGroupController extends Controller
     {
         // $this->validation($request);
         $input = $request->all();
-        $data = new AttributeGroup;
-        // dd($input["name"][0]);
         for($i=0; $i<=count($input["name"]); $i++){
-            $data->name = $input["name"][$i];
-            $data->created_by = Auth::id();
-            $data->ip_address = request()->ip();
-            $data->save();
-        // dd($data);
+            $data["name"] = $input["name"][$i];
+            $data["created_by"] = Auth::id();
+            $data["ip_address"] = request()->ip();
+            $attribute_term_ids = implode(",",$input["attribute_term_id"][$i]);
+            $attribute_group_id = AttributeGroup::insertGetId($data);
+
+
+            $attribute_group_assigned_data = ["attribute_group_id" => $attribute_group_id, "attribute_id" => $input["attribute_id"][$i], "attribute_term_ids" => $attribute_term_ids ];
+            AttributeGroupAssignedTerm::insert($attribute_group_assigned_data);
+
         }
+        return $attribute_group_id;
+
     }
 
 
