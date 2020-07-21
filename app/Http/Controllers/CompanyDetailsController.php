@@ -50,7 +50,7 @@ class CompanyDetailsController extends Controller
 
     public function detailsByCompany($company_id)
     {
-        return $this->showOne(CompanyDetail::whereCompanyId($company_id)->first());
+        return $this->showOne(CompanyDetail::whereCompanyId($company_id)->firstOrFail());
     }
 
 

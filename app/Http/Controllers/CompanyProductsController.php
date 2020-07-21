@@ -28,7 +28,7 @@ class CompanyProductsController extends Controller
     public function store(Request $request)
     {
         $this->validation($request);
-        $productsData = [];
+       /* $productsData = [];
         $mainProducts = is_array($request->main_products) ? array_filter($request->main_products) : [];
         $otherProducts = is_array($request->other_products) ? array_filter($request->other_products) : [];
         if (!empty($mainProducts)) {
@@ -55,8 +55,9 @@ class CompanyProductsController extends Controller
             }
         }
 
-        CompanyProduct::insert($productsData);
-        return $this->createdSuccess($request->all());
+        CompanyProduct::insert($productsData);*/
+        return $this->model->create($request->all());
+       // return $this->createdSuccess($request->all());
     }
 
 
@@ -144,10 +145,12 @@ class CompanyProductsController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|numeric',
-            "main_products" => "required_without:other_products|array|min:1",
+            'name' => 'required|string',
+            'is_main' => 'required|numeric',
+            /*"main_products" => "required_without:other_products|array|min:1",
             "main_products.*" => "required|string",
             "other_products" => "required_without:main_products|min:1",
-            "other_products.*" => "required|string",
+            "other_products.*" => "required|string",*/
         ]);
     }
 
