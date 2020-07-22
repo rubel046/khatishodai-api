@@ -101,8 +101,7 @@ class Repository implements RepositoryInterface
     }
 
     // Get the associated model
-    public
-    function getModel()
+    public function getModel()
     {
         return $this->model;
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Helper\CommonHelper;
 use App\Mail\SendRegOTP;
 use App\Services\MailService;
+use App\Traits\ApiResponse;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
+
     public function sendRegistrationOTP(Request $request)
     {
         Validator::make($request->all(), [
@@ -148,6 +151,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string|min:6',
@@ -164,12 +168,7 @@ class AuthController extends Controller
             return $this->errorResponse('The username or password you entered is incorrect', [], 404);
         }
 
-        return $this->response([
-            'user' => Auth::user(),
-            'token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => Auth::factory()->getTTL() * 600
-        ], 'You have logged in successfully');
+        return $this->respondWithToken($token, 'You have logged in successfully');
     }
 
     public function logout()
