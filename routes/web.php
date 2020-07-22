@@ -19,15 +19,18 @@ $router->get('/', function () use ($router) {
 
 // API route group account
 $router->group(['prefix' => 'account'], function () use ($router) {
+    $router->post('send-registration-otp', 'AuthController@sendRegistrationOTP');
     $router->post('register', 'AuthController@register');
-    $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->post('login', 'AuthController@login');
+    $router->post('logout', 'AuthController@logout');
+
+    $router->get('verify-token/{id}/{token}', 'AuthController@registerTokenVerification');
     $router->get('login/{provider:facebook|google}', 'SocialAuthController@socialLogin');
     $router->get('login/{provider:facebook|google}/callback', 'SocialAuthController@handleProviderCallback');
     $router->post('forget-password', 'PasswordController@forgetPassword');
     $router->get('password-reset/{id}/{verify_token}', 'PasswordController@resetPassword');
     $router->post('password-reset-save', 'PasswordController@resetPasswordSave');
-    $router->post('logout', 'AuthController@logout');
+
     $router->get('profile', 'UserController@profile');
     $router->get('users/{id}', 'UserController@show');
     $router->put('/{id}', 'UserController@update');

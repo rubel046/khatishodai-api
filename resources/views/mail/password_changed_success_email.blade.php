@@ -1,6 +1,6 @@
-Hi <strong> {{$name}}!</strong>,
+Hi there,
 <p>
-   Congratulations! Your tizaara account password changed has been successfully completed. Click here to
+    Congratulations! Your tizaara account password changed has been successfully completed. Click here to
     <a href="www.tizaara.com/lgoin">Login</a>.
 
     <br><br><br>

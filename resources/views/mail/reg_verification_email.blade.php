@@ -1,11 +1,9 @@
-Hi <strong> {{$name}}!</strong>,
+Hi there,
 <p>
-    Your are one step away to create tizaara acount. To complete registration please verify email via clicking this link
-    <a href="{{url('/account/verify-token/'.$id.'/'.$verificationToken)}}">{{$verificationToken}}</a>.
+    Your are one step away to create {{env('APP_NAME')}} account. To complete registration process please use this code:
+    <strong>{{$user->verification_token}}</strong>.
 
     <br><br><br>
     Thanks for being with us. <br>
-    Tizaara.com
-
-    {{--{{$body}}--}}
+    {{env('APP_NAME')}}.com
 </p>

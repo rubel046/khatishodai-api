@@ -19,7 +19,7 @@ trait ApiResponse
             return $this->apiResponse(['result' => $collection], $code);
         }
 
-        return response('',204)->setStatusCode(204, 'No data exists');
+        return response('', 204)->setStatusCode(204, 'No data exists');
     }
 
     protected function pagination($data, $code = 200)
@@ -32,9 +32,25 @@ trait ApiResponse
         return $this->apiResponse(['result' => $model], $code);
     }
 
-    protected function errorResponse($message, $code = 400)
+    protected function errorResponse($message = 'Something went wrong', $errors = [], $code = 400)
     {
-        return $this->apiResponse(['errors' => $message, 'code' => $code], $code);
+        return $this->apiResponse([
+            'success' => false,
+            'message' => $message,
+            'errors' => $message,
+            'code' => $code
+        ], $code);
+    }
+
+    protected function successResponse($message, $data = null, $code = 200)
+    {
+        return response()->json(
+            [
+                'success' => true,
+                'message' => $message,
+                'data' => $data,
+                'code' => $code
+            ]);
     }
 
     protected function showMessage($message, $code = 200)
