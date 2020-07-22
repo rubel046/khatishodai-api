@@ -2,190 +2,200 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helper\CommonHelper;
+use App\Mail\SendRegOTP;
+use App\Services\MailService;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Helper\CommonHelper;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-use  App\User;
-use Laravel\Socialite\Facades\Socialite;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Validator;
-use App\Model\Company;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    /**
-     * Store a new user.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function register(Request $request)
+    public function sendRegistrationOTP(Request $request)
     {
-        //validate incoming request
-        $validator = Validator::make($request->all(), [
-            'firstName' => 'required|string',
-            'lastName' => 'required|string',
-            'emailOrPhone' => 'required|string|unique:users,userName',
-            'password' => 'required|confirmed|min:6',// password_confirmation ( field is Required)
-            /*'email' => 'required|email|unique:users',
-            'phone' => 'unique:users',*/
-            'userType' => 'required|numeric',
-            'country' => 'required|numeric',
-            'companyName' => 'required|string',
-        ]);
+        Validator::make($request->all(), [
+            'username' => 'required|string|unique:users,username',
+        ])->validate();
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'messages' => 'User registration failed, Data not save to record.'], 422);
-        }
-        $login = $this->findLoginWith($request->emailOrPhone);
+        $regMedium = $this->findLoginWith($request->username);
 
-        $email = $phone = null;
-        if ($login == 'email') {
-            $email = $request->input('emailOrPhone');
-            $validator = Validator::make($request->all(), [
-                'emailOrPhone' => 'email|unique:users,email',
-            ], [
-                'emailOrPhone.email' => 'Invalid email or Phone Number',
-                'emailOrPhone.unique' => 'The email is already taken'
-            ]);
-        } else {
-            $phone = $request->input('emailOrPhone');
-            $validator = Validator::make($request->all(), [
-                'emailOrPhone' => 'numeric|digits:11|unique:users,phone',
-            ], [
-                'emailOrPhone.numeric' => 'Invalid email or Phone Number',
-                'emailOrPhone.unique' => 'The phone number is already taken',
-                'emailOrPhone.digits' => 'The phone number must be 11 digits'
+        $this->validateUsername($request, $regMedium);
 
-            ]);
-        }
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'messages' => 'Operation Not success!'], 422);
-        }
+        $email = $regMedium == 'email' ? $request->username : null;
+        $phone = $regMedium == 'email' ? null : $request->username;
 
         try {
-            $user = new User;
-            $user->first_name = $request->input('firstName');
-            $user->last_name = $request->input('lastName');
-            $user->userName = $request->input('emailOrPhone');
-            $user->email = $email;
-            $user->account_type = $request->input('userType');
-            $user->phone = $phone;
-            $plainPassword = $request->input('password');
-            $user->password = app('hash')->make($plainPassword);
-            $user->is_verified = 0;
+            $user = User::create($request->only((new User())->getFillable()) + [
+                    'password' => Hash::make('123456'),
+                    'email' => $email,
+                    'phone' => $phone,
+                    'verification_token' => CommonHelper::generateOTP(4)
+                ]);
+
+            if ($email) {
+                $mailClass = new SendRegOTP($user);
+                MailService::mailSend($user->email, $mailClass);
+
+                return $this->successResponse('An OTP sent to your mail. Please use this OTP', $user);
+            }
+
+            if ($this->sendPhoneCode($phone, $user->verification_token)) {
+                return $this->successResponse('An OTP sent to your phone. Please use this OTP', $user);
+            }
+            return $this->errorResponse('OTP sending failed');
+
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
+
+    public function register(Request $request)
+    {
+        $user = User::where('username', $request->username)
+            //->whereVerificationToken($request->verification_token)
+            ->first();
+
+        if (empty($user)) {
+            return $this->errorResponse('You entered wrong username or OTP.');
+        } else if ($user->is_verified) {
+            return $this->errorResponse('This username already been taken');
+        }
+
+        Validator::make($request->all(), [
+            'name' => 'required|string',
+            'username' => 'required|string|unique:users,username,' . $user->id,
+            'password' => 'required|min:6',// password_confirmation ( field is Required)
+            'verification_token' => 'required'
+            /*'userType' => 'required|integer',
+            'country' => 'required|integer',
+            'companyName' => 'required|string',*/
+        ])->validate();
+
+        try {
+            $user->fill($request->only(['name']) + [
+                    'password' => Hash::make($request->password),
+                    'verification_token' => null,
+                    'is_verified' => 1,
+                    'status' => 1,
+                ]);
+
             $user->save();
 
             // Insert Company Name
-            $companyData = new Company();
-            $companyData->user_id = $user->id;
-            $companyData->name = $request->input('companyName');
-            $companyData->ip_address = $request->ip();
-            $companyData->created_by = $user->id;
-            $companyData->save();
+            /*            $companyData = new Company();
+                        $companyData->user_id = $user->id;
+                        $companyData->name = $request->input('companyName');
+                        $companyData->ip_address = $request->ip();
+                        $companyData->created_by = $user->id;
+                        $companyData->save();
 
-            $toName = $user->first_name . ' ' . $user->last_name;
+                        $toName = $user->first_name . ' ' . $user->last_name;
 
-            if ($email) {
-                $user->verificationToken = CommonHelper::strRandom(40);
-                $toEmail = $email;
-                $data = [
-                    'id' => $user->id,
-                    'email' => $email,
-                    'name' => $toName,
-                    'verificationToken' => $user->verificationToken
-                ];
-                $user->save();
-                try {
-                    // sending verification Email
-                    Mail::send('mail.reg_verification_email', $data, function ($message) use ($toName, $toEmail) {
-                        $message->to($toEmail)->subject('Tizaara Registration Verification');
-                    });
+                        if ($email) {
+                            $user->verificationToken = CommonHelper::strRandom(40);
+                            $toEmail = $email;
+                            $data = [
+                                'id' => $user->id,
+                                'email' => $email,
+                                'name' => $toName,
+                                'verificationToken' => $user->verificationToken
+                            ];
+                            $user->save();
+                            try {
+                                // sending verification Email
+                                Mail::send('mail.reg_verification_email', $data, function ($message) use ($toName, $toEmail) {
+                                    $message->to($toEmail)->subject('Tizaara Registration Verification');
+                                });
 
-                    unset($data['verificationToken']);
-                    return response()->json([
-                        'user' => $data,
-                        'signUpBy' => 'email',
-                        'message' => 'Registration form submitted successfully, Please check email ' . $email . ' to verify your account!'], 201);
-                } catch (\Exception $e) {
-                    return response()->json(['messages' => 'Registration form submitted successfully! Email sending failed. Contact with admin'], 409);
-                }
+                                unset($data['verificationToken']);
+                                return response()->json([
+                                    'user' => $data,
+                                    'signUpBy' => 'email',
+                                    'message' => 'Registration form submitted successfully, Please check email ' . $email . ' to verify your account!'], 201);
+                            } catch (\Exception $e) {
+                                return response()->json(['messages' => 'Registration form submitted successfully! Email sending failed. Contact with admin'], 409);
+                            }
 
-            } else {
-                $data = [
-                    'id' => $user->id,
-                    'phone' => $phone,
-                    'name' => $toName
-                ];
-                // Sending Mobile OTP
-                $otp = rand(100000, 999999);
-                if ($this->sendPhoneCode($phone, $otp)) {
-                    return response()->json([
-                        'user' => $data,
-                        'signUpBy' => 'phone',
-                        'message' => 'Registration form submitted successfully. Please, Check your mobile ' . $phone . ' for verification OTP to verify'], 201);
-                } else {
-                    $user->delete();
-                    return response()->json(['messages' => 'Registration fail! Mobile OTP can not sent. Contact with admin'], 504);
-                }
-            }
+                        } else {
+                            $data = [
+                                'id' => $user->id,
+                                'phone' => $phone,
+                                'name' => $toName
+                            ];
+                            // Sending Mobile OTP
+                            $otp = rand(100000, 999999);
+                            if ($this->sendPhoneCode($phone, $otp)) {
+                                return response()->json([
+                                    'user' => $data,
+                                    'signUpBy' => 'phone',
+                                    'message' => 'Registration form submitted successfully. Please, Check your mobile ' . $phone . ' for verification OTP to verify'], 201);
+                            } else {
+                                $user->delete();
+                                return response()->json(['messages' => 'Registration fail! Mobile OTP can not sent. Contact with admin'], 504);
+                            }
+                        }*/
+
+            return $this->successResponse('Congratulation ! Your registration has been succeed');
 
         } catch (\Exception $e) {
-            return response()->json(['messages' => 'User Registration Failed!'], 409);
+            return $this->errorResponse();
         }
-
     }
 
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @param Request $request
-     * @return Response
-     */
     public function login(Request $request)
     {
-        //validate incoming request
-        $login = $this->findLoginWith($request->emailOrPhone);
         $validator = Validator::make($request->all(), [
-            'emailOrPhone' => 'required|string',
+            'username' => 'required|string',
             'password' => 'required|string|min:6',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        //$credentials = $request->only(['email', 'password']);
-        $credentials = [];
-        if ($login == 'email') {
-            $credentials = [
-                'email' => $request->emailOrPhone,
-                'password' => $request->password,
+        $credentials = $request->only(['username', 'password'] + [
                 'status' => 1
-            ];
-        } else {
-            $credentials = [
-                'phone' => $request->emailOrPhone,
-                'password' => $request->password,
-                'status' => 1
-            ];
-        }
+            ]);
+
         if (!$token = Auth::attempt($credentials, ['expires_in' => Carbon::now()->addDays(7)->timestamp])) {
-            return response()->json(['errors' => ['message' => 'The username or password you entered is incorrect']], 404);
+            return $this->errorResponse('The username or password you entered is incorrect', [], 404);
         }
 
-        return $this->respondWithToken($token);
+        return $this->response([
+            'user' => Auth::user(),
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => Auth::factory()->getTTL() * 600
+        ], 'You have logged in successfully');
     }
 
     public function logout()
     {
-        if (Auth::user()) {
-            Auth::invalidate();
-            return response()->json(['message' => "Logged out"], 200);
+        auth()->logout();
+
+        return $this->successResponse('You have successfully logged out', '', 200);
+    }
+
+    private function validateUsername($request, $regMedium)
+    {
+        if ($regMedium == 'email') {
+            return Validator::make($request->all(), [
+                'username' => 'email|unique:users,email',
+            ], [
+                'username.email' => 'Invalid email',
+                'username.unique' => 'This email is already taken'
+            ])->validate();
         } else {
-            return response()->json(['message' => "Invalid token"], 200);
+            return Validator::make($request->all(), [
+                'username' => 'numeric|digits:11|unique:users,phone',
+            ], [
+                'username.numeric' => 'Invalid email or Phone Number',
+                'username.unique' => 'The phone number is already taken',
+                'username.digits' => 'The phone number must be 11 digits'
+            ])->validate();
         }
     }
 
@@ -231,7 +241,7 @@ class AuthController extends Controller
 
     public function testOtp($phone)
     {
-        if ($this->checkOtpSent($phone) == 0) $this->sendPhoneCode($phone,'test-1234');
+        if ($this->checkOtpSent($phone) == 0) $this->sendPhoneCode($phone, 'test-1234');
         // for check balance
         /*$post_url = 'https://portal.smsinbd.com/api/' ;
         $post_values = array(
@@ -318,7 +328,7 @@ class AuthController extends Controller
     public function sendPhoneCode($phone, $otp)
     {
         $sentStatus = false;
-        $message = "Your tizaara mobile verification OTP code is " . $otp;
+        $message = "Your " . env('APP_NAME') . " mobile verification OTP code is " . $otp;
 
         if (ENV('SMS_GATEWAY') == 'greenweb') {
             // greenweb sms
